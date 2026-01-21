@@ -2,36 +2,46 @@
 <html lang="pt-br">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>RDT HUB — v6 Navigation</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>RDT HUB — v7.1 Mobile</title>
   <style>
     :root{
       --bg: #0f172a; --text: #e6e8ef; --radius: 12px; --accent: #6366f1;
       --card-bg: #1e293b; --border: rgba(255,255,255,0.15);
       --danger: #ef4444;
     }
-    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;overflow:hidden;}
-    * { box-sizing: border-box; outline: none; user-select: none; }
+    /* Bloqueia scroll nativo do navegador para o canvas funcionar bem no mobile */
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;overflow:hidden;touch-action:none;}
+    * { box-sizing: border-box; outline: none; user-select: none; -webkit-tap-highlight-color: transparent; }
 
     /* --- UI GERAL --- */
     .toolbar{
-      position:fixed;left:50%;transform:translateX(-50%);top:20px;z-index:2000;
+      position:fixed;left:50%;transform:translateX(-50%);top:15px;z-index:2000;
       display:flex;gap:8px;align-items:center;
       background:rgba(15, 23, 42, 0.95); border:1px solid var(--border);
       padding: 8px 16px; border-radius:12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      max-width: 95vw; overflow-x: auto; /* Permite scroll horizontal na barra se a tela for muito pequena */
     }
+    
+    /* Título do HUB */
+    .app-title { 
+      font-weight: 800; font-size: 14px; color: #fff; 
+      margin-right: 8px; white-space: nowrap; letter-spacing: 0.5px;
+    }
+
     .btn{
       border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:var(--text);
-      padding:6px 12px; border-radius:6px; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px; transition:0.2s;
+      padding:6px 12px; border-radius:6px; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px; transition:0.2s; white-space: nowrap;
     }
-    .btn:hover{background:rgba(255,255,255,0.15);}
+    .btn:active { transform: scale(0.95); background:rgba(255,255,255,0.2); }
     .btn-primary { background: var(--accent); border-color: transparent; color: white; }
-    .sep { width:1px; height:20px; background:rgba(255,255,255,0.15); margin:0 4px; }
+    .btn-danger { color: #fca5a5; border-color: rgba(239,68,68,0.3); }
+    .sep { width:1px; height:20px; background:rgba(255,255,255,0.15); margin:0 4px; flex-shrink: 0; }
     
     /* Search */
     .search-box { position: relative; display: flex; align-items: center; }
-    .search-input { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px 6px 30px; color: #fff; width: 180px; transition: width 0.2s; }
-    .search-input:focus { width: 250px; border-color: var(--accent); }
+    .search-input { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px 6px 30px; color: #fff; width: 140px; transition: width 0.2s; font-size: 13px; }
+    .search-input:focus { width: 200px; border-color: var(--accent); }
     .search-icon { position: absolute; left: 8px; font-size: 12px; opacity: 0.5; pointer-events: none; }
 
     /* --- CANVAS --- */
@@ -45,11 +55,14 @@
       position:absolute; width:280px; border-radius: var(--radius);
       background: var(--card-bg); border: 1px solid var(--border);
       box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column;
-      transition: box-shadow 0.2s, border-color 0.2s, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transition: box-shadow 0.2s, border-color 0.2s;
+      /* Otimização para mobile */
+      touch-action: none; 
     }
     .envelope.open {
       width: 950px; height: 600px; z-index: 100 !important;
       box-shadow: 0 50px 100px rgba(0,0,0,0.8); border-color: rgba(255,255,255,0.4);
+      max-width: 95vw; max-height: 90vh; /* Responsivo */
     }
     .envelope.highlight { animation: pulse 1.5s ease; border-color: var(--accent); z-index: 200; }
     @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(99,102,241,0.7)} 70%{box-shadow:0 0 0 20px rgba(99,102,241,0)} 100%{box-shadow:0 0 0 0 rgba(99,102,241,0)} }
@@ -62,7 +75,6 @@
     }
     .env-head:active { cursor: grabbing; }
     
-    /* Nome Cortado */
     .env-title-wrapper { flex: 1; overflow: hidden; margin-right: 10px; }
     .env-name { 
       font-weight: 700; padding: 2px 6px; border-radius: 4px; cursor: text; font-size: 14px;
@@ -70,16 +82,15 @@
     }
     .env-name:focus { background: rgba(0,0,0,0.8); cursor: text; white-space: normal; overflow: visible; position: relative; z-index: 10; }
 
-    /* Tooltip (Balão) */
+    /* Tooltip */
     .env-tooltip {
       position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 10px;
       background: #0f172a; border: 1px solid var(--accent); padding: 10px; border-radius: 8px;
       width: 200px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); pointer-events: none;
-      opacity: 0; transition: opacity 0.2s, transform 0.2s; z-index: 1000;
+      opacity: 0; transition: opacity 0.2s; z-index: 1000;
       display: flex; flex-direction: column; gap: 4px;
     }
-    .env-tooltip::after { content:''; position:absolute; top:100%; left:50%; margin-left:-6px; border-width:6px; border-style:solid; border-color: var(--accent) transparent transparent transparent; }
-    .env-head:hover .env-tooltip { opacity: 1; transform: translateX(-50%) translateY(-5px); }
+    .env-head:hover .env-tooltip { opacity: 1; }
     .tt-title { font-weight: bold; color: #fff; font-size: 13px; }
     .tt-info { font-size: 11px; color: #94a3b8; }
 
@@ -87,47 +98,45 @@
     .env-closed { padding: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
     .env-thumb { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; background: #000; border: 1px solid var(--border); }
     
-    .env-open { display: flex; flex: 1; overflow: hidden; background: rgba(255,255,255,0.02); }
+    .env-open { display: flex; flex: 1; overflow: hidden; background: rgba(255,255,255,0.02); flex-direction: row; }
+    /* Responsivo para mobile: vira coluna */
+    @media (max-width: 768px) { .env-open { flex-direction: column; } .col-left { width: 100% !important; height: 200px; border-right: none; border-bottom: 1px solid var(--border); } }
+
     .col-left { width: 300px; padding: 15px; border-right: 1px solid var(--border); background: rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
     .col-right { flex: 1; display: flex; flex-direction: column; background: #1e293b; overflow: hidden; }
 
-    .cover-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; position: relative; }
+    .cover-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; position: relative; flex-shrink: 0; }
     .cover-img { width: 100%; height: 100%; object-fit: cover; }
     .color-picker { display: flex; gap: 8px; justify-content: center; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; flex-wrap: wrap; }
     .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); }
     .color-dot.selected { border-color: #fff; box-shadow: 0 0 0 2px #fff; }
-    .desc-area { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 6px; resize: none; font-size: 13px; min-height: 100px; }
+    .desc-area { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 6px; resize: none; font-size: 13px; min-height: 80px; }
 
     /* Tabs */
-    .tabs-head { display: flex; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); }
-    .tab-btn { padding: 12px 24px; background: transparent; border: none; color: rgba(255,255,255,0.6); cursor: pointer; border-bottom: 3px solid transparent; font-weight: 600; }
+    .tabs-head { display: flex; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); overflow-x: auto; }
+    .tab-btn { padding: 12px 24px; background: transparent; border: none; color: rgba(255,255,255,0.6); cursor: pointer; border-bottom: 3px solid transparent; font-weight: 600; white-space: nowrap; }
     .tab-btn.active { color: #fff; border-bottom-color: var(--accent); background: rgba(255,255,255,0.05); }
     .tab-content { flex: 1; padding: 15px; overflow-y: auto; display: none; }
     .tab-content.active { display: block; }
 
     /* Lists */
     .team-item { display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; margin-bottom: 6px; border: 1px solid transparent; }
-    .team-item:hover { border-color: var(--border); background: rgba(255,255,255,0.05); }
     .team-code { font-family: monospace; font-size: 11px; background: rgba(99,102,241,0.2); color: #a5b4fc; padding: 2px 6px; border-radius: 4px; min-width: 35px; text-align: center; }
 
     .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 10px; }
     .etiqueta { display: flex; gap: 10px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; position: relative; }
-    /* Indicador de Link Interno */
     .etiqueta.is-link { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
-    .etiqueta-thumb { width: 60px; height: 60px; background: #000; border-radius: 6px; flex-shrink: 0; cursor: pointer; border: 1px solid var(--border); object-fit: cover; position: relative; }
-    .etiqueta-thumb:hover { opacity: 0.8; }
-    
+    .etiqueta-thumb { width: 60px; height: 60px; background: #000; border-radius: 6px; flex-shrink: 0; cursor: pointer; border: 1px solid var(--border); object-fit: cover; }
     .etiqueta-info { flex: 1; display: flex; flex-direction: column; gap: 5px; }
     .etiqueta-text { width: 100%; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; height: 100%; }
 
     /* MODAL */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-    .modal { background: #1e293b; width: 450px; padding: 25px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 25px 50px rgba(0,0,0,0.9); }
+    .modal { background: #1e293b; width: 450px; padding: 25px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 25px 50px rgba(0,0,0,0.9); max-width: 90vw; }
     .form-row { display: flex; gap: 10px; margin-bottom: 15px; }
     .form-group { margin-bottom: 15px; flex: 1; }
     .form-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; font-weight: 600; }
     .form-group input, .form-group select { width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; border-radius: 6px; }
-    .form-group input:focus { border-color: var(--accent); }
 
     .hidden { display: none !important; }
   </style>
@@ -140,11 +149,14 @@
   <input type="file" id="fileInputLegacy" accept=".js,.txt" style="display:none">
 
   <div class="toolbar">
+    <!-- TÍTULO AQUI -->
+    <span class="app-title">RDT-01-HUB</span>
+    
     <button class="btn" id="btnAddEnv"><span>➕</span> Novo</button>
     <div class="sep"></div>
     <div class="search-box">
       <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" class="search-input" placeholder="Buscar envelope...">
+      <input type="text" id="searchInput" class="search-input" placeholder="Buscar...">
     </div>
     <div class="sep"></div>
     <button class="btn" id="btnImportLegacy">📦 Migrar</button>
@@ -200,9 +212,19 @@
       let el = document.getElementById(env.id);
       if (!el) {
         el = document.createElement("div"); el.id = env.id; el.className = "envelope"; world.appendChild(el);
+        
+        // EVENTOS DE PONTEIRO (Touch/Mouse)
+        // Se clicar no Header -> Arrasta Envelope
+        // Se clicar fora -> Arrasta Canvas (Pan)
         el.addEventListener("pointerdown", e => {
-          if(e.target.closest('input, textarea, button, .etiqueta-thumb, .env-name, .color-dot, .team-item')) return;
-          startDragEnv(e, env);
+          // Se o alvo for input, botão ou imagem, não inicia drag do envelope
+          if(e.target.closest('input, textarea, button, .etiqueta-thumb, .color-dot, .team-item')) return;
+          
+          // Se for no Header, inicia drag do envelope
+          if(e.target.closest('.env-head')) {
+            startDragEnv(e, env);
+            e.stopPropagation(); // Impede que o canvas receba o evento
+          }
         });
       }
 
@@ -224,21 +246,13 @@
   function renderContent(el, env) {
     const isOpen = env.isOpen;
     
-    // Tooltip HTML
-    const tooltipHTML = `
-      <div class="env-tooltip">
-        <div class="tt-title">${env.name}</div>
-        <div class="tt-info">ID: ${env.id}</div>
-        <div class="tt-info">${env.tags.length} Etiquetas • ${env.team.length} Links</div>
-      </div>
-    `;
+    // Tooltip
+    const tooltipHTML = `<div class="env-tooltip"><div class="tt-title">${env.name}</div><div class="tt-info">ID: ${env.id}</div><div class="tt-info">${env.tags.length} Tags • ${env.team.length} Links</div></div>`;
 
     const headerHTML = `
       <div class="env-head">
         ${tooltipHTML}
-        <div class="env-title-wrapper">
-          <span class="env-name" contenteditable="true" spellcheck="false">${env.name}</span>
-        </div>
+        <div class="env-title-wrapper"><span class="env-name" contenteditable="true" spellcheck="false">${env.name}</span></div>
         <div style="display:flex; gap:6px;">
           ${!isOpen ? `<span style="font-size:12px;opacity:0.7">${env.tags.length} Tags</span>` : ''}
           <button class="btn btn-danger btn-del-env" style="padding:4px 8px">🗑️</button>
@@ -265,7 +279,6 @@
       `).join('');
 
       const tagsHTML = env.tags.map(t => {
-        // Verifica se é link interno (começa com env:)
         const isInternal = t.url && t.url.startsWith('env:');
         return `
         <div class="etiqueta ${isInternal ? 'is-link' : ''}" data-id="${t.id}">
@@ -315,7 +328,6 @@
     attachEvents(el, env);
   }
 
-  // --- Lógica de Navegação (Links Internos) ---
   window.handleTagClick = (url) => {
     if (!url) return;
     if (url.startsWith('env:')) {
@@ -333,17 +345,13 @@
       STATE.cam.y = -target.y + window.innerHeight/2 - 100;
       STATE.cam.z = 1;
       applyCam();
-      
       const el = document.getElementById(id);
       if(el) {
         el.classList.add('highlight');
         setTimeout(() => el.classList.remove('highlight'), 1500);
-        // Opcional: Abrir automaticamente
         if(!target.isOpen) { target.isOpen = true; target._forceUpdate = true; render(); }
       }
-    } else {
-      alert("Envelope destino não encontrado.");
-    }
+    } else { alert("Envelope destino não encontrado."); }
   }
 
   function attachEvents(el, env) {
@@ -370,7 +378,6 @@
         el.querySelector(btn.dataset.tab === 'team' ? '#tab-team' : '#tab-tags').classList.add('active');
       });
 
-      // Equipe
       el.querySelectorAll('.chk-team').forEach(chk => chk.onchange = () => env.team[chk.dataset.idx].checked = chk.checked);
       const btnAll = el.querySelector('.btn-open-all'); 
       if(btnAll) btnAll.onclick = () => { let d=0; env.team.filter(m=>m.checked).forEach(m => { setTimeout(() => window.open(m.url,'_blank'), d); d+=300; }); };
@@ -379,7 +386,6 @@
       el.querySelectorAll('.btn-edit-team').forEach(btn => btn.onclick = () => openEditor('team', env.team[btn.dataset.idx], env));
       el.querySelectorAll('.btn-del-team').forEach(btn => btn.onclick = () => { if(confirm("Excluir?")) { env.team.splice(btn.dataset.idx, 1); env._forceUpdate=true; render(); } });
 
-      // Etiquetas
       const btnAddTag = el.querySelector('.btn-add-tag');
       if(btnAddTag) btnAddTag.onclick = () => { const n={id:Date.now(), text:"", url:"", img:`https://placehold.co/60x60/333/FFF?text=IMG`}; env.tags.push(n); env._forceUpdate=true; render(); openEditor('tag', n, env); };
       el.querySelectorAll('.etiqueta-text').forEach(inp => inp.oninput = e => { const t = env.tags.find(tag=>tag.id==e.target.closest('.etiqueta').dataset.id); if(t) t.text = e.target.value; });
@@ -388,7 +394,6 @@
     }
   }
 
-  // --- EDITOR ---
   function openEditor(type, item, env) {
     editingCtx = { type, item, env };
     const fields = document.getElementById("modalFields");
@@ -397,19 +402,11 @@
       fields.innerHTML = `<div class="form-row"><div class="form-group" style="flex:0 0 80px"><label>Código</label><input id="inpCode" value="${item.code||''}"></div><div class="form-group"><label>Rótulo</label><input id="inpLabel" value="${item.label||''}"></div></div><div class="form-group"><label>URL</label><input id="inpUrl" value="${item.url||''}"></div>`;
     } else {
       document.getElementById("modalTitle").innerText = "Editar Etiqueta";
-      // Dropdown de Envelopes para Link Interno
       const envOptions = STATE.envelopes.map(e => `<option value="env:${e.id}">${e.name}</option>`).join('');
-      
       fields.innerHTML = `
         <div class="form-group"><label>Texto</label><input id="inpText" value="${item.text||''}"></div>
-        <div class="form-group">
-          <label>🔗 Linkar para Envelope (Opcional)</label>
-          <select id="inpEnvLink" onchange="if(this.value) document.getElementById('inpUrl').value = this.value">
-            <option value="">-- Selecione um Envelope --</option>
-            ${envOptions}
-          </select>
-        </div>
-        <div class="form-group"><label>URL Destino (ou ID do Envelope)</label><input id="inpUrl" value="${item.url||''}"></div>
+        <div class="form-group"><label>🔗 Linkar para Envelope</label><select id="inpEnvLink" onchange="if(this.value) document.getElementById('inpUrl').value = this.value"><option value="">-- Selecione --</option>${envOptions}</select></div>
+        <div class="form-group"><label>URL Destino</label><input id="inpUrl" value="${item.url||''}"></div>
         <div class="form-group"><label>URL Imagem</label><input id="inpImg" value="${item.img||''}"></div>
       `;
     }
@@ -427,7 +424,6 @@
     modal.classList.add("hidden");
   };
 
-  // --- Search ---
   searchInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       const term = searchInput.value.toLowerCase();
@@ -437,15 +433,28 @@
     }
   });
 
-  // --- Drag & Cam ---
-  function startDragEnv(e, env) { e.preventDefault(); const el = document.getElementById(env.id); el.style.zIndex = 200; const sx=e.clientX, sy=e.clientY, ex=env.x, ey=env.y, z=STATE.cam.z; const move = ev => { env.x = ex + (ev.clientX-sx)/z; env.y = ey + (ev.clientY-sy)/z; el.style.left=env.x+"px"; el.style.top=env.y+"px"; }; const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); el.style.zIndex=env.isOpen?100:""; }; window.addEventListener("pointermove", move); window.addEventListener("pointerup", up); }
+  // --- DRAG & PAN (Mobile Fixed) ---
+  function startDragEnv(e, env) { 
+    e.preventDefault(); 
+    const el = document.getElementById(env.id); el.style.zIndex = 200; 
+    const sx=e.clientX, sy=e.clientY, ex=env.x, ey=env.y, z=STATE.cam.z;
+    const move = ev => { env.x = ex + (ev.clientX-sx)/z; env.y = ey + (ev.clientY-sy)/z; el.style.left=env.x+"px"; el.style.top=env.y+"px"; };
+    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); el.style.zIndex=env.isOpen?100:""; };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  }
+
   function applyCam() { 
     world.style.transform = `translate(${STATE.cam.x}px, ${STATE.cam.y}px) scale(${STATE.cam.z})`; 
     viewport.style.backgroundPosition = `${STATE.cam.x}px ${STATE.cam.y}px`;
     viewport.style.backgroundSize = `${40 * STATE.cam.z}px ${40 * STATE.cam.z}px`;
   }
+
   let panning=false, panS={};
-  viewport.onpointerdown = e => { if(e.target.closest('.envelope')) return; panning=true; viewport.classList.add('dragging'); panS={x:e.clientX, y:e.clientY, cx:STATE.cam.x, cy:STATE.cam.y}; viewport.setPointerCapture(e.pointerId); };
+  viewport.onpointerdown = e => { 
+    // Só inicia PAN se clicar direto no viewport (fundo)
+    if(e.target !== viewport && e.target !== world) return;
+    panning=true; viewport.classList.add('dragging'); panS={x:e.clientX, y:e.clientY, cx:STATE.cam.x, cy:STATE.cam.y}; viewport.setPointerCapture(e.pointerId); 
+  };
   viewport.onpointermove = e => { if(!panning) return; STATE.cam.x=panS.cx+(e.clientX-panS.x); STATE.cam.y=panS.cy+(e.clientY-panS.y); applyCam(); };
   viewport.onpointerup = () => { panning=false; viewport.classList.remove('dragging'); };
   viewport.onwheel = e => { if(!e.ctrlKey)return; e.preventDefault(); const f=e.deltaY>0?0.9:1.1; STATE.cam.z=Math.max(0.2, Math.min(3, STATE.cam.z*f)); applyCam(); };
