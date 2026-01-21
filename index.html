@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>RDT-01-HUB [v.: 0.13.2]</title>
+  <title>RDT-01-HUB [v.: 0.14]</title>
   <style>
     :root{
       --bg: #0f172a; --text: #e6e8ef; --radius: 12px; --accent: #6366f1;
@@ -26,21 +26,7 @@
     .btn:active { background: rgba(255,255,255,0.2); }
     .btn-primary { background: var(--accent); border-color: transparent; color: white; }
     
-    /* Botão Micro (Correção solicitada) */
-    .btn-micro {
-      width: 100%;
-      padding: 4px 0; /* Padding vertical mínimo */
-      font-size: 11px;
-      background: transparent;
-      border: 1px dashed rgba(255,255,255,0.2);
-      color: #94a3b8;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: -4px; /* Aproxima da imagem */
-      transition: all 0.2s;
-      height: auto; /* Remove altura forçada */
-      flex: 0 0 auto; /* Impede de crescer no flexbox */
-    }
+    .btn-micro { width: 100%; padding: 4px 0; font-size: 11px; background: transparent; border: 1px dashed rgba(255,255,255,0.2); color: #94a3b8; border-radius: 4px; cursor: pointer; margin-top: -4px; transition: all 0.2s; height: auto; flex: 0 0 auto; }
     .btn-micro:hover { border-color: var(--accent); color: #fff; background: rgba(255,255,255,0.05); }
 
     .search-box { position: relative; width: 100%; }
@@ -52,6 +38,31 @@
     .viewport{ width:100%; height:100%; position:relative; cursor:grab; overflow:hidden; background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 40px 40px; }
     .viewport.dragging{cursor:grabbing}
     .world{ position:absolute;left:0;top:0; transform-origin:0 0; will-change: transform; }
+
+    /* --- MARCADOR (NOVO) --- */
+    .marker {
+      position: absolute; cursor: grab; z-index: 50;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: transform 0.2s;
+    }
+    .marker:hover { transform: scale(1.05); z-index: 51; }
+    .marker.highlight { animation: pulseMarker 1.5s ease infinite; }
+    
+    /* Estilo Texto */
+    .marker-text { 
+      font-weight: 900; text-transform: uppercase; letter-spacing: 2px;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.8); white-space: nowrap;
+      padding: 5px 10px; border-radius: 8px; border: 2px solid transparent;
+    }
+    .marker:hover .marker-text { border-color: rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); }
+
+    /* Estilo Imagem */
+    .marker-img { 
+      object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); 
+      pointer-events: none; 
+    }
+
+    @keyframes pulseMarker { 0%{transform:scale(1)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
 
     /* --- ENVELOPE --- */
     .envelope{ position:absolute; width:260px; border-radius: var(--radius); background: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; transition: box-shadow 0.2s, border-color 0.2s; touch-action: none; }
@@ -78,29 +89,15 @@
     .env-open { display: flex; flex: 1; overflow: hidden; background: rgba(255,255,255,0.02); flex-direction: row; }
     @media (max-width: 768px) { .env-open { flex-direction: column; } .col-left { width: 100% !important; height: auto; max-height: 200px; border-right: none; border-bottom: 1px solid var(--border); } }
 
-    /* Layout da Coluna Esquerda Ajustado */
-    .col-left { 
-      width: 300px; padding: 12px; border-right: 1px solid var(--border); 
-      background: rgba(0,0,0,0.2); display: flex; flex-direction: column; 
-      gap: 8px; /* Gap reduzido para economizar espaço */
-      overflow-y: auto; 
-    }
+    .col-left { width: 300px; padding: 12px; border-right: 1px solid var(--border); background: rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
     .col-right { flex: 1; display: flex; flex-direction: column; background: #1e293b; overflow: hidden; }
 
     .cover-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; position: relative; flex-shrink: 0; }
     .cover-img { width: 100%; height: 100%; object-fit: cover; }
-    
     .color-picker { display: flex; gap: 8px; justify-content: center; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 8px; flex-wrap: wrap; flex-shrink: 0; }
     .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); }
     .color-dot.selected { border-color: #fff; box-shadow: 0 0 0 2px #fff; }
-    
-    /* Descrição com flex: 1 para ocupar todo o resto */
-    .desc-area { 
-      flex: 1; /* Ocupa o espaço restante */
-      background: rgba(0,0,0,0.3); border: 1px solid var(--border); 
-      color: #fff; padding: 10px; border-radius: 6px; resize: none; 
-      font-size: 13px; min-height: 100px; 
-    }
+    .desc-area { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 6px; resize: none; font-size: 13px; min-height: 100px; }
 
     .tabs-head { display: flex; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); overflow-x: auto; }
     .tab-btn { padding: 12px 24px; background: transparent; border: none; color: rgba(255,255,255,0.6); cursor: pointer; border-bottom: 3px solid transparent; font-weight: 600; white-space: nowrap; }
@@ -115,13 +112,10 @@
     .etiqueta { display: flex; gap: 10px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; position: relative; transition: transform 0.2s; }
     .etiqueta.has-link { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
     .etiqueta.drag-swap { border-color: var(--success); background: rgba(34, 197, 94, 0.1); }
-    
     .etiqueta-thumb { width: 60px; height: 60px; background: #000; border-radius: 6px; flex-shrink: 0; cursor: pointer; border: 1px solid var(--border); object-fit: cover; }
     .etiqueta-thumb:hover { opacity: 0.8; border-color: var(--accent); }
-    
     .etiqueta-info { flex: 1; display: flex; flex-direction: column; gap: 5px; }
     .etiqueta-text { width: 100%; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; height: 100%; }
-    
     .btn-link-internal { background: var(--accent); color: white; border: none; }
     .btn-link-internal:hover { background: #4338ca; }
 
@@ -157,13 +151,14 @@
   <button id="btnMenu" class="hamburger-btn">≡</button>
 
   <div class="toolbar" id="mainToolbar">
-    <span class="app-title">RDT-01-HUB [v.: 0.13.2]</span>
+    <span class="app-title">RDT-01-HUB [v.: 0.14]</span>
     <div class="search-box">
       <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" class="search-input" placeholder="Buscar envelope...">
+      <input type="text" id="searchInput" class="search-input" placeholder="Buscar envelope ou marcador...">
     </div>
     <div class="toolbar-row">
       <button class="btn btn-primary" id="btnAddEnv"><span>➕</span> Novo</button>
+      <button class="btn" id="btnAddMarker">📍 Marcador</button>
       <button class="btn" id="btnExport">💾 Salvar</button>
     </div>
     <div class="toolbar-row">
@@ -205,7 +200,7 @@
 <script>
 (() => {
   const ENV_PALETTE = ["#1e293b", "#312e81", "#7f1d1d", "#78350f", "#064e3b", "#831843", "#000000"];
-  let STATE = { cam: {x:0, y:0, z:1}, envelopes: [] };
+  let STATE = { cam: {x:0, y:0, z:1}, envelopes: [], markers: [] };
   let editingCtx = null; 
   let isDraggingTag = false;
   let selectedEnvLink = null; 
@@ -220,6 +215,7 @@
   function init() {
     if (window.RDT_DATA) {
       STATE.envelopes = window.RDT_DATA.envelopes || [];
+      STATE.markers = window.RDT_DATA.markers || [];
       if(window.RDT_DATA.cam) STATE.cam = window.RDT_DATA.cam;
     } else {
       STATE.envelopes = [{ 
@@ -228,6 +224,7 @@
         tags: [{id:1, text:"Anotações...", url:"#", img:"https://placehold.co/60x60/333/FFF?text=IMG"}],
         icon: "", description: ""
       }];
+      STATE.markers = [];
     }
     applyCam();
     render();
@@ -255,21 +252,50 @@
   document.getElementById("btnZoomOut").onclick = () => zoomManual(0.8);
 
   function render() {
-    STATE.envelopes.forEach(env => {
-      let el = document.getElementById(env.id);
-      if (!el) {
-        el = document.createElement("div"); el.id = env.id; el.className = "envelope"; world.appendChild(el);
-        el.addEventListener("pointerdown", e => {
-          if(e.target.closest('input, textarea, button, .etiqueta-thumb, .env-name, .color-dot, .team-item')) return;
-          if(e.target.closest('.env-head')) { startDragEnv(e, env); e.stopPropagation(); }
-        });
-        el.addEventListener("dblclick", e => {
-          if(e.target.classList.contains('env-thumb')) {
-             env.isOpen = true; env._forceUpdate = true; render();
-          }
-        });
+    world.innerHTML = ''; // Limpa tudo para redesenhar (simples e eficaz)
+
+    // Render Markers
+    STATE.markers.forEach(mk => {
+      const el = document.createElement("div");
+      el.className = "marker";
+      el.id = mk.id;
+      el.style.left = mk.x + "px";
+      el.style.top = mk.y + "px";
+      
+      if (mk.type === 'image') {
+        el.innerHTML = `<img src="${mk.content}" class="marker-img" style="width:${mk.size||100}px; height:${mk.size||100}px">`;
+      } else {
+        el.innerHTML = `<div class="marker-text" style="font-size:${mk.size||24}px; color:${mk.color||'#fff'}">${mk.content}</div>`;
       }
 
+      // Drag Marker
+      el.onpointerdown = (e) => {
+        e.preventDefault(); e.stopPropagation();
+        startDragItem(e, mk, el);
+      };
+      
+      // Edit Marker
+      el.ondblclick = (e) => {
+        e.stopPropagation();
+        openEditor('marker', mk);
+      };
+
+      // Delete Marker (Right Click)
+      el.oncontextmenu = (e) => {
+        e.preventDefault();
+        if(confirm("Apagar Marcador?")) {
+          STATE.markers = STATE.markers.filter(m => m.id !== mk.id);
+          render();
+        }
+      };
+
+      world.appendChild(el);
+    });
+
+    // Render Envelopes
+    STATE.envelopes.forEach(env => {
+      const el = document.createElement("div"); el.id = env.id; el.className = "envelope"; 
+      
       el.style.left = env.x + "px"; el.style.top = env.y + "px";
       const baseColor = env.color || ENV_PALETTE[0];
       el.style.background = env.isOpen ? `linear-gradient(145deg, ${baseColor}, #0f172a)` : baseColor;
@@ -277,11 +303,20 @@
       if (env.isOpen) { el.classList.add("open"); el.style.zIndex = 100 + STATE.envelopes.indexOf(env); }
       else { el.classList.remove("open"); el.style.zIndex = ""; }
 
-      const hash = `${env.isOpen}-${env.team.length}-${env.tags.map(t=>t.id).join('')}-${env.name}-${env.color}-${env.icon}`;
-      if (el.dataset.hash !== hash || env._forceUpdate) {
-        el.dataset.hash = hash; env._forceUpdate = false;
-        renderContent(el, env);
-      }
+      renderContent(el, env);
+      
+      // Drag Envelope
+      el.onpointerdown = (e) => {
+        if(e.target.closest('input, textarea, button, .etiqueta-thumb, .env-name, .color-dot, .team-item')) return;
+        if(e.target.closest('.env-head')) { startDragItem(e, env, el); e.stopPropagation(); }
+      };
+      
+      // Open on Double Click Image
+      el.ondblclick = (e) => {
+        if(e.target.classList.contains('env-thumb')) { env.isOpen = true; render(); }
+      };
+
+      world.appendChild(el);
     });
   }
 
@@ -346,10 +381,7 @@
         <div class="env-open">
           <div class="col-left">
             <div class="cover-wrapper">${env.icon ? `<img src="${env.icon}" class="cover-img">` : '<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#666">Sem Capa</span>'}</div>
-            
-            <!-- Botão Micro Corrigido -->
             <button class="btn-micro btn-change-cover">🖼️ Alterar Capa</button>
-            
             <div class="color-picker">${ENV_PALETTE.map(c => `<div class="color-dot ${env.color===c?'selected':''}" style="background:${c}" data-c="${c}"></div>`).join('')}</div>
             <textarea class="desc-area" placeholder="Descrição geral...">${env.description||''}</textarea>
           </div>
@@ -374,17 +406,12 @@
   }
 
   // --- HANDLERS ---
-  window.handleTagImageClick = (url) => {
-    if (isDraggingTag) return;
-    if (url) window.open(url, '_blank');
-  };
+  window.handleTagImageClick = (url) => { if (isDraggingTag) return; if (url) window.open(url, '_blank'); };
 
   window.flyToEnvelope = (id) => {
     const target = STATE.envelopes.find(e => e.id == id);
     if (target) {
-      target.isOpen = true;
-      target._forceUpdate = true;
-      render();
+      target.isOpen = true; render();
       const w = 950, h = 600;
       const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
       STATE.cam.x = cx - target.x - (w / 2);
@@ -396,9 +423,20 @@
     } else { alert("Envelope destino não encontrado."); }
   };
 
+  function flyToMarker(mk) {
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+    STATE.cam.x = cx - mk.x;
+    STATE.cam.y = cy - mk.y;
+    STATE.cam.z = 1;
+    applyCam();
+    const el = document.getElementById(mk.id);
+    if(el) { el.classList.add('highlight'); setTimeout(() => el.classList.remove('highlight'), 1500); }
+  }
+
   function attachEvents(el, env) {
-    const btnOpen = el.querySelector('.btn-open'); if(btnOpen) btnOpen.onclick = () => { env.isOpen = true; env._forceUpdate = true; render(); };
-    const btnClose = el.querySelector('.btn-close'); if(btnClose) btnClose.onclick = () => { env.isOpen = false; env._forceUpdate = true; render(); };
+    const btnOpen = el.querySelector('.btn-open'); if(btnOpen) btnOpen.onclick = () => { env.isOpen = true; render(); };
+    const btnClose = el.querySelector('.btn-close'); if(btnClose) btnClose.onclick = () => { env.isOpen = false; render(); };
     const btnDelEnv = el.querySelector('.btn-del-env'); if(btnDelEnv) btnDelEnv.onclick = () => { if(confirm("Apagar?")) { STATE.envelopes = STATE.envelopes.filter(e=>e.id!==env.id); el.remove(); } };
     
     const nameEl = el.querySelector('.env-name');
@@ -409,9 +447,9 @@
     }
 
     if(env.isOpen) {
-      el.querySelectorAll('.color-dot').forEach(d => d.onclick = () => { env.color = d.dataset.c; env._forceUpdate = true; render(); });
+      el.querySelectorAll('.color-dot').forEach(d => d.onclick = () => { env.color = d.dataset.c; render(); });
       const desc = el.querySelector('.desc-area'); if(desc) desc.oninput = () => env.description = desc.value;
-      el.querySelector('.btn-change-cover').onclick = () => { const url = prompt("URL da Capa:", env.icon); if(url!==null) { env.icon = url; env._forceUpdate = true; render(); } };
+      el.querySelector('.btn-change-cover').onclick = () => { const url = prompt("URL da Capa:", env.icon); if(url!==null) { env.icon = url; render(); } };
 
       el.querySelectorAll('.tab-btn').forEach(btn => btn.onclick = () => {
         el.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -424,16 +462,23 @@
       const btnAll = el.querySelector('.btn-open-all'); 
       if(btnAll) btnAll.onclick = () => { let d=0; env.team.filter(m=>m.checked).forEach(m => { setTimeout(() => window.open(m.url,'_blank'), d); d+=300; }); };
       const btnAddTeam = el.querySelector('.btn-add-team');
-      if(btnAddTeam) btnAddTeam.onclick = () => { const n={code:"LNK", label:"Novo", url:"#", checked:true}; env.team.push(n); env._forceUpdate=true; render(); openEditor('team', n, env); };
+      if(btnAddTeam) btnAddTeam.onclick = () => { const n={code:"LNK", label:"Novo", url:"#", checked:true}; env.team.push(n); render(); openEditor('team', n, env); };
       el.querySelectorAll('.btn-edit-team').forEach(btn => btn.onclick = () => openEditor('team', env.team[btn.dataset.idx], env));
-      el.querySelectorAll('.btn-del-team').forEach(btn => btn.onclick = () => { if(confirm("Excluir?")) { env.team.splice(btn.dataset.idx, 1); env._forceUpdate=true; render(); } });
+      el.querySelectorAll('.btn-del-team').forEach(btn => btn.onclick = () => { if(confirm("Excluir?")) { env.team.splice(btn.dataset.idx, 1); render(); } });
 
       const btnAddTag = el.querySelector('.btn-add-tag');
-      if(btnAddTag) btnAddTag.onclick = () => { const n={id:Date.now(), text:"", url:"", img:`https://placehold.co/60x60/333/FFF?text=IMG`, targetEnvId: ""}; env.tags.push(n); env._forceUpdate=true; render(); openEditor('tag', n, env); };
+      if(btnAddTag) btnAddTag.onclick = () => { const n={id:Date.now(), text:"", url:"", img:`https://placehold.co/60x60/333/FFF?text=IMG`, targetEnvId: ""}; env.tags.push(n); render(); openEditor('tag', n, env); };
       el.querySelectorAll('.etiqueta-text').forEach(inp => inp.oninput = e => { const t = env.tags.find(tag=>tag.id==e.target.closest('.etiqueta').dataset.id); if(t) t.text = e.target.value; });
       el.querySelectorAll('.btn-edit-tag').forEach(btn => btn.onclick = e => { const id = e.target.closest('.etiqueta').dataset.id; openEditor('tag', env.tags.find(t=>t.id==id), env); });
-      el.querySelectorAll('.btn-del-tag').forEach(btn => btn.onclick = e => { if(confirm("Excluir?")) { const id = e.target.closest('.etiqueta').dataset.id; env.tags = env.tags.filter(t=>t.id!=id); env._forceUpdate=true; render(); } });
+      el.querySelectorAll('.btn-del-tag').forEach(btn => btn.onclick = e => { if(confirm("Excluir?")) { const id = e.target.closest('.etiqueta').dataset.id; env.tags = env.tags.filter(t=>t.id!=id); render(); } });
       
+      // NOVO: Botão de Conexão (Link)
+      el.querySelectorAll('.btn-link-tag').forEach(btn => btn.onclick = e => {
+        const id = e.target.closest('.etiqueta').dataset.id;
+        const tag = env.tags.find(t => t.id == id);
+        openEditor('tag', tag, env); // Abre editor para conectar
+      });
+
       el.querySelectorAll('.etiqueta-thumb').forEach(img => {
         img.onpointerdown = (e) => {
           e.preventDefault(); e.stopPropagation();
@@ -454,10 +499,10 @@
     else if (direction === 'bottom') { newTags.splice(idx, 1); newTags.push(tag); } 
     else if (direction === 'up' && idx > 0) { [newTags[idx], newTags[idx-1]] = [newTags[idx-1], newTags[idx]]; } 
     else if (direction === 'down' && idx < newTags.length - 1) { [newTags[idx], newTags[idx+1]] = [newTags[idx+1], newTags[idx]]; }
-    env.tags = newTags; env._forceUpdate = true; render();
+    env.tags = newTags; render();
   }
 
-  // --- SMART SEARCH EDITOR ---
+  // --- EDITOR ---
   function openEditor(type, item, env) {
     editingCtx = { type, item, env };
     selectedEnvLink = item.targetEnvId || null;
@@ -468,56 +513,47 @@
       document.getElementById("modalTitle").innerText = "Editar Link da Equipe";
       reorderDiv.style.display = 'none';
       fields.innerHTML = `<div class="form-row"><div class="form-group" style="flex:0 0 80px"><label>Código</label><input id="inpCode" value="${item.code||''}"></div><div class="form-group"><label>Rótulo</label><input id="inpLabel" value="${item.label||''}"></div></div><div class="form-group"><label>URL</label><input id="inpUrl" value="${item.url||''}"></div>`;
+    } else if (type === 'marker') {
+      document.getElementById("modalTitle").innerText = "Editar Marcador";
+      reorderDiv.style.display = 'none';
+      fields.innerHTML = `
+        <div class="form-group"><label>Tipo</label><select id="inpType"><option value="text" ${item.type==='text'?'selected':''}>Texto</option><option value="image" ${item.type==='image'?'selected':''}>Imagem</option></select></div>
+        <div class="form-group"><label>Conteúdo (Texto ou URL)</label><input id="inpContent" value="${item.content||''}"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Tamanho (px)</label><input id="inpSize" type="number" value="${item.size||100}"></div>
+          <div class="form-group"><label>Cor (Texto)</label><input id="inpColor" type="color" value="${item.color||'#ffffff'}" style="height:40px"></div>
+        </div>
+      `;
     } else {
       document.getElementById("modalTitle").innerText = "Editar Etiqueta";
       reorderDiv.style.display = 'flex';
-      
       let currentLinkName = "";
       if(item.targetEnvId) {
         const found = STATE.envelopes.find(e => e.id == item.targetEnvId);
         if(found) currentLinkName = found.name;
       }
-
       fields.innerHTML = `
         <div class="form-group"><label>Texto</label><input id="inpText" value="${item.text||''}"></div>
         <div class="form-group"><label>URL do Recurso (Externo)</label><input id="inpUrl" value="${item.url||''}" placeholder="https://..."></div>
-        
-        <div class="form-group">
-          <label>Conectar a Envelope (Interno)</label>
-          <input id="inpEnvSearch" placeholder="Digite para buscar..." value="${currentLinkName}" autocomplete="off">
-          <div id="envSearchResults" class="search-results-list"></div>
-        </div>
-
+        <div class="form-group"><label>Conectar a Envelope (Interno)</label><input id="inpEnvSearch" placeholder="Digite para buscar..." value="${currentLinkName}" autocomplete="off"><div id="envSearchResults" class="search-results-list"></div></div>
         <div class="form-group"><label>URL Imagem</label><input id="inpImg" value="${item.img||''}"></div>
       `;
       
       const inpSearch = document.getElementById('inpEnvSearch');
       const list = document.getElementById('envSearchResults');
-      
       inpSearch.oninput = (e) => {
         const term = e.target.value.toLowerCase();
         if(!term) { list.style.display = 'none'; return; }
-        
         const matches = STATE.envelopes.filter(e => e.id !== env.id && e.name.toLowerCase().includes(term));
-        
         if(matches.length) {
           list.innerHTML = matches.map(e => `<div class="search-item" data-id="${e.id}">${e.name}</div>`).join('');
           list.style.display = 'block';
-          
           list.querySelectorAll('.search-item').forEach(div => {
-            div.onclick = () => {
-              inpSearch.value = div.innerText;
-              selectedEnvLink = div.dataset.id;
-              list.style.display = 'none';
-            };
+            div.onclick = () => { inpSearch.value = div.innerText; selectedEnvLink = div.dataset.id; list.style.display = 'none'; };
           });
-        } else {
-          list.style.display = 'none';
-        }
+        } else { list.style.display = 'none'; }
       };
-      
       inpSearch.onchange = () => { if(!inpSearch.value) selectedEnvLink = null; };
-
       document.getElementById("btnMoveTop").onclick = () => moveTag(item, 'top', env);
       document.getElementById("btnMoveUp").onclick = () => moveTag(item, 'up', env);
       document.getElementById("btnMoveDown").onclick = () => moveTag(item, 'down', env);
@@ -534,94 +570,84 @@
         item.code = document.getElementById("inpCode").value; 
         item.label = document.getElementById("inpLabel").value; 
         item.url = document.getElementById("inpUrl").value; 
+      } else if (type === 'marker') {
+        item.type = document.getElementById("inpType").value;
+        item.content = document.getElementById("inpContent").value;
+        item.size = parseInt(document.getElementById("inpSize").value);
+        item.color = document.getElementById("inpColor").value;
       } else { 
         item.text = document.getElementById("inpText").value; 
         item.url = document.getElementById("inpUrl").value; 
         item.img = document.getElementById("inpImg").value; 
         item.targetEnvId = selectedEnvLink; 
       }
-      env._forceUpdate = true; render();
+      render();
     }
     modal.classList.add("hidden");
   };
 
+  // --- SEARCH ---
   searchInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       const term = searchInput.value.toLowerCase();
-      const target = STATE.envelopes.find(env => env.name.toLowerCase().includes(term));
-      if (target) flyToEnvelope(target.id);
-      else alert("Envelope não encontrado.");
+      // Search Envelopes
+      const targetEnv = STATE.envelopes.find(env => env.name.toLowerCase().includes(term));
+      if (targetEnv) { flyToEnvelope(targetEnv.id); return; }
+      // Search Markers
+      const targetMk = STATE.markers.find(mk => mk.content.toLowerCase().includes(term));
+      if (targetMk) { flyToMarker(targetMk); return; }
+      
+      alert("Nada encontrado.");
     }
   });
+
+  // --- DRAG GENERIC ---
+  function startDragItem(e, item, el) {
+    const sx = e.clientX, sy = e.clientY, ex = item.x, ey = item.y, z = STATE.cam.z;
+    const move = ev => { item.x = ex + (ev.clientX-sx)/z; item.y = ey + (ev.clientY-sy)/z; el.style.left=item.x+"px"; el.style.top=item.y+"px"; };
+    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  }
 
   function startDragTag(e, tag, sourceEnv) {
     const ghost = document.createElement('div'); ghost.className = 'ghost-tag';
     ghost.innerHTML = `<img src="${tag.img}"><span>${tag.text || 'Etiqueta'}</span>`;
     document.body.appendChild(ghost);
-    
     const updateGhost = (x, y) => { ghost.style.left = (x + 15) + 'px'; ghost.style.top = (y + 15) + 'px'; };
     updateGhost(e.clientX, e.clientY);
-    
-    let targetEnvId = null;
-    let swapTargetId = null; 
-    let hasMoved = false;
-
+    let targetEnvId = null; let swapTargetId = null; let hasMoved = false;
     const move = (ev) => {
-      hasMoved = true;
-      isDraggingTag = true;
-      updateGhost(ev.clientX, ev.clientY);
-      ghost.style.display = 'none';
-      const elem = document.elementFromPoint(ev.clientX, ev.clientY);
-      ghost.style.display = 'flex';
-      
+      hasMoved = true; isDraggingTag = true; updateGhost(ev.clientX, ev.clientY);
+      ghost.style.display = 'none'; const elem = document.elementFromPoint(ev.clientX, ev.clientY); ghost.style.display = 'flex';
       const envEl = elem ? elem.closest('.envelope') : null;
       document.querySelectorAll('.envelope.drag-over').forEach(el => el.classList.remove('drag-over'));
       document.querySelectorAll('.etiqueta.drag-swap').forEach(el => el.classList.remove('drag-swap'));
-
       if (envEl && envEl.classList.contains('open')) {
         targetEnvId = envEl.id;
         if (targetEnvId === sourceEnv.id) {
            const tagEl = elem.closest('.etiqueta');
-           if (tagEl && tagEl.dataset.id != tag.id) {
-             swapTargetId = parseInt(tagEl.dataset.id);
-             tagEl.classList.add('drag-swap');
-           } else { swapTargetId = null; }
+           if (tagEl && tagEl.dataset.id != tag.id) { swapTargetId = parseInt(tagEl.dataset.id); tagEl.classList.add('drag-swap'); } else { swapTargetId = null; }
         } else { envEl.classList.add('drag-over'); }
       } else { targetEnvId = null; }
     };
-
     const up = () => {
-      window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up);
-      ghost.remove();
+      window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); ghost.remove();
       document.querySelectorAll('.envelope.drag-over').forEach(el => el.classList.remove('drag-over'));
       document.querySelectorAll('.etiqueta.drag-swap').forEach(el => el.classList.remove('drag-swap'));
-      
       setTimeout(() => isDraggingTag = false, 100);
-
       if (hasMoved && targetEnvId) {
         const targetEnv = STATE.envelopes.find(e => e.id === targetEnvId);
         if (targetEnv) {
           if (targetEnv.id === sourceEnv.id && swapTargetId) {
             const idx1 = sourceEnv.tags.findIndex(t => t.id === tag.id);
             const idx2 = sourceEnv.tags.findIndex(t => t.id === swapTargetId);
-            if (idx1 > -1 && idx2 > -1) {
-              const temp = sourceEnv.tags[idx1];
-              sourceEnv.tags[idx1] = sourceEnv.tags[idx2];
-              sourceEnv.tags[idx2] = temp;
-              sourceEnv._forceUpdate = true;
-              render();
-            }
+            if (idx1 > -1 && idx2 > -1) { [sourceEnv.tags[idx1], sourceEnv.tags[idx2]] = [sourceEnv.tags[idx2], sourceEnv.tags[idx1]]; render(); }
           } else if (targetEnv.id !== sourceEnv.id) {
-            sourceEnv.tags = sourceEnv.tags.filter(t => t.id !== tag.id);
-            targetEnv.tags.push(tag);
-            sourceEnv._forceUpdate = true;
-            targetEnv._forceUpdate = true;
-            render();
+            sourceEnv.tags = sourceEnv.tags.filter(t => t.id !== tag.id); targetEnv.tags.push(tag); render();
           }
         }
       }
     };
-    
     window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
   }
 
@@ -650,6 +676,7 @@
   viewport.onwheel = e => { if(!e.ctrlKey)return; e.preventDefault(); const f=e.deltaY>0?0.9:1.1; STATE.cam.z=Math.max(0.2, Math.min(3, STATE.cam.z*f)); applyCam(); };
 
   document.getElementById("btnAddEnv").onclick = () => { STATE.envelopes.push({id:`env-${Date.now()}`, name:"Novo", color:ENV_PALETTE[0], x: -STATE.cam.x+window.innerWidth/2-140, y: -STATE.cam.y+window.innerHeight/2-100, isOpen:true, team:[], tags:[]}); render(); };
+  document.getElementById("btnAddMarker").onclick = () => { STATE.markers.push({id:`mk-${Date.now()}`, type:'text', content:'NOVO', x: -STATE.cam.x+window.innerWidth/2, y: -STATE.cam.y+window.innerHeight/2, size:30, color:'#ffffff'}); render(); };
   document.getElementById("btnExport").onclick = () => { const b=new Blob([`window.RDT_DATA = ${JSON.stringify(STATE, null, 2)};`], {type:"text/javascript"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="data.js"; a.click(); };
   document.getElementById("btnLoad").onclick = () => document.getElementById("fileInput").click();
   document.getElementById("fileInput").onchange = e => { const f=e.target.files[0]; if(f){ const r=new FileReader(); r.onload=ev=>{ try{ STATE=JSON.parse(ev.target.result.replace(/^window\.RDT_DATA\s*=\s*/,'').replace(/;?\s*$/,'')); applyCam(); render(); }catch(e){alert("Erro");} }; r.readAsText(f); e.target.value=''; }};
