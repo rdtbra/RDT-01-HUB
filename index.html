@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>RDT HUB — v11 Link Fix</title>
+  <title>RDT HUB — v12 Dual Links</title>
   <style>
     :root{
       --bg: #0f172a; --text: #e6e8ef; --radius: 12px; --accent: #6366f1;
       --card-bg: #1e293b; --border: rgba(255,255,255,0.15);
-      --danger: #ef4444;
+      --danger: #ef4444; --success: #22c55e;
     }
     html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;overflow:hidden;touch-action:none;}
     * { box-sizing: border-box; outline: none; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -80,13 +80,20 @@
     .team-item { display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; margin-bottom: 6px; border: 1px solid transparent; }
     .team-code { font-family: monospace; font-size: 11px; background: rgba(99,102,241,0.2); color: #a5b4fc; padding: 2px 6px; border-radius: 4px; min-width: 35px; text-align: center; }
 
+    /* Etiquetas */
     .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 10px; }
     .etiqueta { display: flex; gap: 10px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; position: relative; }
-    .etiqueta.is-link { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
+    .etiqueta.has-link { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
+    
     .etiqueta-thumb { width: 60px; height: 60px; background: #000; border-radius: 6px; flex-shrink: 0; cursor: pointer; border: 1px solid var(--border); object-fit: cover; }
-    .etiqueta-thumb:hover { opacity: 0.8; }
+    .etiqueta-thumb:hover { opacity: 0.8; border-color: var(--accent); }
+    
     .etiqueta-info { flex: 1; display: flex; flex-direction: column; gap: 5px; }
     .etiqueta-text { width: 100%; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; height: 100%; }
+    
+    /* Botão Link Interno */
+    .btn-link-internal { background: var(--accent); color: white; border: none; }
+    .btn-link-internal:hover { background: #4338ca; }
 
     .ghost-tag { position: fixed; z-index: 9999; padding: 8px; background: #1e293b; border: 1px solid var(--accent); border-radius: 8px; display: flex; gap: 10px; align-items: center; pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     .ghost-tag img { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; }
@@ -262,19 +269,21 @@
       `).join('');
 
       const tagsHTML = env.tags.map(t => {
-        const isInternal = t.url && t.url.startsWith('env:');
+        // Verifica se tem link interno
+        const hasInternal = !!t.targetEnvId;
+        
         return `
-        <div class="etiqueta ${isInternal ? 'is-link' : ''}" data-id="${t.id}">
-          <img src="${t.img}" class="etiqueta-thumb" title="Abrir Link / Arrastar" 
-               onclick="handleTagClick('${t.url||''}')" 
+        <div class="etiqueta ${hasInternal ? 'has-link' : ''}" data-id="${t.id}">
+          <img src="${t.img}" class="etiqueta-thumb" title="Abrir URL Externa / Arrastar" 
+               onclick="handleTagImageClick('${t.url||''}')" 
                onerror="this.src='https://placehold.co/60x60/333/FFF?text=ERR'">
           <div class="etiqueta-info">
             <div style="display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:11px;color:${isInternal?'var(--accent)':'#aaa'}">
-                ${isInternal ? '🔗 Link Interno' : (t.url ? '↗ Externo' : 'Sem Link')}
+              <span style="font-size:11px;color:${hasInternal?'var(--accent)':'#aaa'}">
+                ${hasInternal ? '🔗 Conectado' : (t.url ? '↗ Externo' : 'Sem Link')}
               </span>
               <div style="display:flex;gap:4px">
-                <button class="btn btn-link-tag" style="padding:2px 6px;font-size:11px" title="Conectar a Envelope">🔗</button>
+                ${hasInternal ? `<button class="btn btn-link-internal" onclick="flyToEnvelope('${t.targetEnvId}')" style="padding:2px 6px;font-size:11px" title="Ir para Envelope">🔗</button>` : ''}
                 <button class="btn btn-edit-tag" style="padding:2px 6px;font-size:11px">✏️</button>
                 <button class="btn btn-danger btn-del-tag" style="padding:2px 6px;font-size:11px">🗑️</button>
               </div>
@@ -312,41 +321,26 @@
     attachEvents(el, env);
   }
 
-  window.handleTagClick = (url) => {
+  // --- HANDLERS ---
+  window.handleTagImageClick = (url) => {
     if (isDraggingTag) return;
-    if (!url) return;
-    if (url.startsWith('env:')) {
-      const targetId = url.split(':')[1];
-      flyToEnvelope(targetId);
-    } else {
-      window.open(url, '_blank');
-    }
+    if (url) window.open(url, '_blank');
   };
 
-  function flyToEnvelope(id) {
-    // CORREÇÃO: Usar == para comparar string (id do link) com number/string (id do envelope)
+  window.flyToEnvelope = (id) => {
     const target = STATE.envelopes.find(e => e.id == id);
     if (target) {
-      // Abre o envelope alvo
       target.isOpen = true;
       target._forceUpdate = true;
-      render(); // Renderiza para garantir que as dimensões existam
-
-      // Dimensões do envelope aberto (definido no CSS)
-      const w = 950;
-      const h = 600;
+      render();
       
-      // Centraliza a câmera no envelope ABERTO
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight / 2;
-      
+      const w = 950, h = 600;
+      const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
       STATE.cam.x = cx - target.x - (w / 2);
       STATE.cam.y = cy - target.y - (h / 2);
-      STATE.cam.z = 1; // Reset de zoom para visualização ideal
-      
+      STATE.cam.z = 1;
       applyCam();
       
-      // Highlight
       const el = document.getElementById(target.id);
       if(el) {
         el.classList.add('highlight');
@@ -355,7 +349,7 @@
     } else { 
       alert("Envelope destino não encontrado."); 
     }
-  }
+  };
 
   function attachEvents(el, env) {
     const btnOpen = el.querySelector('.btn-open'); if(btnOpen) btnOpen.onclick = () => { env.isOpen = true; env._forceUpdate = true; render(); };
@@ -390,18 +384,11 @@
       el.querySelectorAll('.btn-del-team').forEach(btn => btn.onclick = () => { if(confirm("Excluir?")) { env.team.splice(btn.dataset.idx, 1); env._forceUpdate=true; render(); } });
 
       const btnAddTag = el.querySelector('.btn-add-tag');
-      if(btnAddTag) btnAddTag.onclick = () => { const n={id:Date.now(), text:"", url:"", img:`https://placehold.co/60x60/333/FFF?text=IMG`}; env.tags.push(n); env._forceUpdate=true; render(); openEditor('tag', n, env); };
+      if(btnAddTag) btnAddTag.onclick = () => { const n={id:Date.now(), text:"", url:"", img:`https://placehold.co/60x60/333/FFF?text=IMG`, targetEnvId: ""}; env.tags.push(n); env._forceUpdate=true; render(); openEditor('tag', n, env); };
       el.querySelectorAll('.etiqueta-text').forEach(inp => inp.oninput = e => { const t = env.tags.find(tag=>tag.id==e.target.closest('.etiqueta').dataset.id); if(t) t.text = e.target.value; });
       el.querySelectorAll('.btn-edit-tag').forEach(btn => btn.onclick = e => { const id = e.target.closest('.etiqueta').dataset.id; openEditor('tag', env.tags.find(t=>t.id==id), env); });
       el.querySelectorAll('.btn-del-tag').forEach(btn => btn.onclick = e => { if(confirm("Excluir?")) { const id = e.target.closest('.etiqueta').dataset.id; env.tags = env.tags.filter(t=>t.id!=id); env._forceUpdate=true; render(); } });
       
-      // NOVO: Botão de Conexão (Link)
-      el.querySelectorAll('.btn-link-tag').forEach(btn => btn.onclick = e => {
-        const id = e.target.closest('.etiqueta').dataset.id;
-        const tag = env.tags.find(t => t.id == id);
-        openConnectModal(tag, env);
-      });
-
       el.querySelectorAll('.etiqueta-thumb').forEach(img => {
         img.onpointerdown = (e) => {
           e.preventDefault(); e.stopPropagation();
@@ -413,29 +400,6 @@
     }
   }
 
-  // --- MODAL DE CONEXÃO ---
-  function openConnectModal(tag, env) {
-    editingCtx = { type: 'connect', item: tag, env: env };
-    document.getElementById("modalTitle").innerText = "Conectar a Envelope";
-    const options = STATE.envelopes
-      .filter(e => e.id !== env.id)
-      .map(e => `<option value="env:${e.id}">${e.name}</option>`)
-      .join('');
-
-    const fields = document.getElementById("modalFields");
-    fields.innerHTML = `
-      <div class="form-group">
-        <label>Escolha o Envelope de Destino:</label>
-        <select id="inpConnect" style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid #fff;color:#fff;border-radius:6px">
-          <option value="">-- Selecione --</option>
-          ${options}
-        </select>
-      </div>
-      <p style="font-size:12px;color:#aaa;margin-top:10px">Isso fará com que clicar na imagem desta etiqueta leve diretamente ao envelope escolhido.</p>
-    `;
-    modal.classList.remove("hidden");
-  }
-
   function openEditor(type, item, env) {
     editingCtx = { type, item, env };
     const fields = document.getElementById("modalFields");
@@ -444,11 +408,11 @@
       fields.innerHTML = `<div class="form-row"><div class="form-group" style="flex:0 0 80px"><label>Código</label><input id="inpCode" value="${item.code||''}"></div><div class="form-group"><label>Rótulo</label><input id="inpLabel" value="${item.label||''}"></div></div><div class="form-group"><label>URL</label><input id="inpUrl" value="${item.url||''}"></div>`;
     } else {
       document.getElementById("modalTitle").innerText = "Editar Etiqueta";
-      const envOptions = STATE.envelopes.map(e => `<option value="env:${e.id}">${e.name}</option>`).join('');
+      const envOptions = STATE.envelopes.map(e => `<option value="${e.id}" ${item.targetEnvId == e.id ? 'selected' : ''}>${e.name}</option>`).join('');
       fields.innerHTML = `
         <div class="form-group"><label>Texto</label><input id="inpText" value="${item.text||''}"></div>
-        <div class="form-group"><label>🔗 Linkar para Envelope</label><select id="inpEnvLink" onchange="if(this.value) document.getElementById('inpUrl').value = this.value"><option value="">-- Selecione --</option>${envOptions}</select></div>
-        <div class="form-group"><label>URL Destino</label><input id="inpUrl" value="${item.url||''}"></div>
+        <div class="form-group"><label>URL do Recurso (Externo)</label><input id="inpUrl" value="${item.url||''}" placeholder="https://..."></div>
+        <div class="form-group"><label>Conectar a Envelope (Interno)</label><select id="inpEnvLink"><option value="">-- Nenhum --</option>${envOptions}</select></div>
         <div class="form-group"><label>URL Imagem</label><input id="inpImg" value="${item.img||''}"></div>
       `;
     }
@@ -459,10 +423,7 @@
   document.getElementById("btnSaveModal").onclick = () => {
     if (editingCtx) {
       const { type, item, env } = editingCtx;
-      if (type === 'connect') {
-        const val = document.getElementById("inpConnect").value;
-        if(val) item.url = val;
-      } else if (type === 'team') { 
+      if (type === 'team') { 
         item.code = document.getElementById("inpCode").value; 
         item.label = document.getElementById("inpLabel").value; 
         item.url = document.getElementById("inpUrl").value; 
@@ -470,6 +431,7 @@
         item.text = document.getElementById("inpText").value; 
         item.url = document.getElementById("inpUrl").value; 
         item.img = document.getElementById("inpImg").value; 
+        item.targetEnvId = document.getElementById("inpEnvLink").value;
       }
       env._forceUpdate = true; render();
     }
