@@ -8,7 +8,7 @@ window.RDT_DATA = {
     {
       "id": "env-demo",
       "name": "Matemática",
-      "color": "#312e81",
+      "color": "#000000",
       "x": 80.82946752226401,
       "y": -15.456154905719515,
       "isOpen": false,
