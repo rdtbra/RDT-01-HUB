@@ -3,46 +3,57 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>RDT HUB — v7.1 Mobile</title>
+  <title>RDT HUB — v8 Mobile Menu</title>
   <style>
     :root{
       --bg: #0f172a; --text: #e6e8ef; --radius: 12px; --accent: #6366f1;
       --card-bg: #1e293b; --border: rgba(255,255,255,0.15);
       --danger: #ef4444;
     }
-    /* Bloqueia scroll nativo do navegador para o canvas funcionar bem no mobile */
     html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;overflow:hidden;touch-action:none;}
     * { box-sizing: border-box; outline: none; user-select: none; -webkit-tap-highlight-color: transparent; }
 
-    /* --- UI GERAL --- */
-    .toolbar{
-      position:fixed;left:50%;transform:translateX(-50%);top:15px;z-index:2000;
-      display:flex;gap:8px;align-items:center;
-      background:rgba(15, 23, 42, 0.95); border:1px solid var(--border);
-      padding: 8px 16px; border-radius:12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      max-width: 95vw; overflow-x: auto; /* Permite scroll horizontal na barra se a tela for muito pequena */
+    /* --- HAMBURGUER (Botão Menu) --- */
+    .hamburger-btn {
+      position: fixed; top: 15px; left: 15px; z-index: 2100;
+      width: 45px; height: 45px; border-radius: 50%;
+      background: var(--accent); border: none; color: white;
+      font-size: 24px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
     }
-    
-    /* Título do HUB */
-    .app-title { 
-      font-weight: 800; font-size: 14px; color: #fff; 
-      margin-right: 8px; white-space: nowrap; letter-spacing: 0.5px;
-    }
+    .hamburger-btn:active { transform: scale(0.9); }
+    .hamburger-btn.active { background: var(--danger); }
 
-    .btn{
-      border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:var(--text);
-      padding:6px 12px; border-radius:6px; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px; transition:0.2s; white-space: nowrap;
+    /* --- TOOLBAR (Menu Expansível) --- */
+    .toolbar {
+      position: fixed; top: 70px; left: 15px; z-index: 2000;
+      background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border);
+      padding: 12px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      display: flex; flex-direction: column; gap: 10px; width: 260px;
+      backdrop-filter: blur(10px);
+      
+      /* Animação de Entrada */
+      transform: translateX(-120%); opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .btn:active { transform: scale(0.95); background:rgba(255,255,255,0.2); }
+    .toolbar.show { transform: translateX(0); opacity: 1; }
+
+    .toolbar-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .app-title { font-weight: 800; font-size: 16px; color: #fff; margin-bottom: 5px; display: block; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+    .btn {
+      border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text);
+      padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; 
+      display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; flex: 1;
+    }
+    .btn:active { background: rgba(255,255,255,0.2); }
     .btn-primary { background: var(--accent); border-color: transparent; color: white; }
-    .btn-danger { color: #fca5a5; border-color: rgba(239,68,68,0.3); }
-    .sep { width:1px; height:20px; background:rgba(255,255,255,0.15); margin:0 4px; flex-shrink: 0; }
     
     /* Search */
-    .search-box { position: relative; display: flex; align-items: center; }
-    .search-input { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px 6px 30px; color: #fff; width: 140px; transition: width 0.2s; font-size: 13px; }
-    .search-input:focus { width: 200px; border-color: var(--accent); }
-    .search-icon { position: absolute; left: 8px; font-size: 12px; opacity: 0.5; pointer-events: none; }
+    .search-box { position: relative; width: 100%; }
+    .search-input { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px 8px 30px; color: #fff; width: 100%; font-size: 14px; }
+    .search-input:focus { border-color: var(--accent); }
+    .search-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 14px; opacity: 0.5; pointer-events: none; }
 
     /* --- CANVAS --- */
     .viewport{ width:100%; height:100%; position:relative; cursor:grab; overflow:hidden; 
@@ -55,19 +66,17 @@
       position:absolute; width:280px; border-radius: var(--radius);
       background: var(--card-bg); border: 1px solid var(--border);
       box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column;
-      transition: box-shadow 0.2s, border-color 0.2s;
-      /* Otimização para mobile */
-      touch-action: none; 
+      transition: box-shadow 0.2s, border-color 0.2s; touch-action: none; 
     }
     .envelope.open {
       width: 950px; height: 600px; z-index: 100 !important;
       box-shadow: 0 50px 100px rgba(0,0,0,0.8); border-color: rgba(255,255,255,0.4);
-      max-width: 95vw; max-height: 90vh; /* Responsivo */
+      max-width: 95vw; max-height: 85vh; /* Ajuste mobile */
     }
     .envelope.highlight { animation: pulse 1.5s ease; border-color: var(--accent); z-index: 200; }
+    .envelope.drag-over { border-color: #22c55e; box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.3); }
     @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(99,102,241,0.7)} 70%{box-shadow:0 0 0 20px rgba(99,102,241,0)} 100%{box-shadow:0 0 0 0 rgba(99,102,241,0)} }
 
-    /* Header & Tooltip */
     .env-head{
       height: 45px; display:flex; justify-content:space-between; align-items:center;
       padding: 0 10px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border);
@@ -82,25 +91,21 @@
     }
     .env-name:focus { background: rgba(0,0,0,0.8); cursor: text; white-space: normal; overflow: visible; position: relative; z-index: 10; }
 
-    /* Tooltip */
     .env-tooltip {
       position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 10px;
       background: #0f172a; border: 1px solid var(--accent); padding: 10px; border-radius: 8px;
       width: 200px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); pointer-events: none;
-      opacity: 0; transition: opacity 0.2s; z-index: 1000;
-      display: flex; flex-direction: column; gap: 4px;
+      opacity: 0; transition: opacity 0.2s; z-index: 1000; display: flex; flex-direction: column; gap: 4px;
     }
     .env-head:hover .env-tooltip { opacity: 1; }
     .tt-title { font-weight: bold; color: #fff; font-size: 13px; }
     .tt-info { font-size: 11px; color: #94a3b8; }
 
-    /* Body */
     .env-closed { padding: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
     .env-thumb { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; background: #000; border: 1px solid var(--border); }
     
     .env-open { display: flex; flex: 1; overflow: hidden; background: rgba(255,255,255,0.02); flex-direction: row; }
-    /* Responsivo para mobile: vira coluna */
-    @media (max-width: 768px) { .env-open { flex-direction: column; } .col-left { width: 100% !important; height: 200px; border-right: none; border-bottom: 1px solid var(--border); } }
+    @media (max-width: 768px) { .env-open { flex-direction: column; } .col-left { width: 100% !important; height: auto; max-height: 200px; border-right: none; border-bottom: 1px solid var(--border); } }
 
     .col-left { width: 300px; padding: 15px; border-right: 1px solid var(--border); background: rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
     .col-right { flex: 1; display: flex; flex-direction: column; background: #1e293b; overflow: hidden; }
@@ -112,25 +117,26 @@
     .color-dot.selected { border-color: #fff; box-shadow: 0 0 0 2px #fff; }
     .desc-area { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 6px; resize: none; font-size: 13px; min-height: 80px; }
 
-    /* Tabs */
     .tabs-head { display: flex; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); overflow-x: auto; }
     .tab-btn { padding: 12px 24px; background: transparent; border: none; color: rgba(255,255,255,0.6); cursor: pointer; border-bottom: 3px solid transparent; font-weight: 600; white-space: nowrap; }
     .tab-btn.active { color: #fff; border-bottom-color: var(--accent); background: rgba(255,255,255,0.05); }
     .tab-content { flex: 1; padding: 15px; overflow-y: auto; display: none; }
     .tab-content.active { display: block; }
 
-    /* Lists */
     .team-item { display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; margin-bottom: 6px; border: 1px solid transparent; }
     .team-code { font-family: monospace; font-size: 11px; background: rgba(99,102,241,0.2); color: #a5b4fc; padding: 2px 6px; border-radius: 4px; min-width: 35px; text-align: center; }
 
     .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 10px; }
     .etiqueta { display: flex; gap: 10px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; position: relative; }
     .etiqueta.is-link { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
-    .etiqueta-thumb { width: 60px; height: 60px; background: #000; border-radius: 6px; flex-shrink: 0; cursor: pointer; border: 1px solid var(--border); object-fit: cover; }
+    .etiqueta-thumb { width: 60px; height: 60px; background: #000; border-radius: 6px; flex-shrink: 0; cursor: grab; border: 1px solid var(--border); object-fit: cover; }
+    .etiqueta-thumb:active { cursor: grabbing; }
     .etiqueta-info { flex: 1; display: flex; flex-direction: column; gap: 5px; }
     .etiqueta-text { width: 100%; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; height: 100%; }
 
-    /* MODAL */
+    .ghost-tag { position: fixed; z-index: 9999; padding: 8px; background: #1e293b; border: 1px solid var(--accent); border-radius: 8px; display: flex; gap: 10px; align-items: center; pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .ghost-tag img { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; }
+
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
     .modal { background: #1e293b; width: 450px; padding: 25px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 25px 50px rgba(0,0,0,0.9); max-width: 90vw; }
     .form-row { display: flex; gap: 10px; margin-bottom: 15px; }
@@ -148,27 +154,38 @@
   <input type="file" id="fileInput" accept=".js" style="display:none">
   <input type="file" id="fileInputLegacy" accept=".js,.txt" style="display:none">
 
-  <div class="toolbar">
-    <!-- TÍTULO AQUI -->
+  <!-- BOTÃO HAMBURGUER (Fixo) -->
+  <button id="btnMenu" class="hamburger-btn">≡</button>
+
+  <!-- MENU (Toolbar Escondida) -->
+  <div class="toolbar" id="mainToolbar">
     <span class="app-title">RDT-01-HUB</span>
     
-    <button class="btn" id="btnAddEnv"><span>➕</span> Novo</button>
-    <div class="sep"></div>
     <div class="search-box">
       <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" class="search-input" placeholder="Buscar...">
+      <input type="text" id="searchInput" class="search-input" placeholder="Buscar envelope...">
     </div>
-    <div class="sep"></div>
-    <button class="btn" id="btnImportLegacy">📦 Migrar</button>
-    <button class="btn" id="btnLoad">📂 Abrir</button>
-    <button class="btn btn-primary" id="btnExport">💾 Salvar</button>
+
+    <div class="toolbar-row">
+      <button class="btn btn-primary" id="btnAddEnv"><span>➕</span> Novo</button>
+      <button class="btn" id="btnExport">💾 Salvar</button>
+    </div>
+
+    <div class="toolbar-row">
+      <button class="btn" id="btnZoomIn">🔍+</button>
+      <button class="btn" id="btnZoomOut">🔍-</button>
+    </div>
+
+    <div class="toolbar-row">
+      <button class="btn" id="btnImportLegacy">📦 Migrar</button>
+      <button class="btn" id="btnLoad">📂 Abrir</button>
+    </div>
   </div>
 
   <div class="viewport" id="viewport">
     <div class="world" id="world"></div>
   </div>
 
-  <!-- Modal -->
   <div id="editModal" class="modal-overlay hidden">
     <div class="modal">
       <h3 id="modalTitle" style="margin-top:0; color:#fff; border-bottom:1px solid var(--border); padding-bottom:15px">Editar</h3>
@@ -190,6 +207,8 @@
   const world = document.getElementById("world");
   const modal = document.getElementById("editModal");
   const searchInput = document.getElementById("searchInput");
+  const mainToolbar = document.getElementById("mainToolbar");
+  const btnMenu = document.getElementById("btnMenu");
 
   function init() {
     if (window.RDT_DATA) {
@@ -207,24 +226,42 @@
     render();
   }
 
+  // --- MENU LOGIC ---
+  btnMenu.onclick = () => {
+    mainToolbar.classList.toggle("show");
+    btnMenu.classList.toggle("active");
+    btnMenu.innerText = mainToolbar.classList.contains("show") ? "✖" : "≡";
+  };
+
+  // --- ZOOM BUTTONS ---
+  function zoomManual(factor) {
+    // Zoom em direção ao centro da tela
+    const rect = viewport.getBoundingClientRect();
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    
+    const wx = (cx - STATE.cam.x) / STATE.cam.z;
+    const wy = (cy - STATE.cam.y) / STATE.cam.z;
+
+    let newZ = Math.max(0.1, Math.min(5, STATE.cam.z * factor));
+    
+    STATE.cam.x = cx - wx * newZ;
+    STATE.cam.y = cy - wy * newZ;
+    STATE.cam.z = newZ;
+    
+    applyCam();
+  }
+  document.getElementById("btnZoomIn").onclick = () => zoomManual(1.2);
+  document.getElementById("btnZoomOut").onclick = () => zoomManual(0.8);
+
   function render() {
     STATE.envelopes.forEach(env => {
       let el = document.getElementById(env.id);
       if (!el) {
         el = document.createElement("div"); el.id = env.id; el.className = "envelope"; world.appendChild(el);
-        
-        // EVENTOS DE PONTEIRO (Touch/Mouse)
-        // Se clicar no Header -> Arrasta Envelope
-        // Se clicar fora -> Arrasta Canvas (Pan)
         el.addEventListener("pointerdown", e => {
-          // Se o alvo for input, botão ou imagem, não inicia drag do envelope
-          if(e.target.closest('input, textarea, button, .etiqueta-thumb, .color-dot, .team-item')) return;
-          
-          // Se for no Header, inicia drag do envelope
-          if(e.target.closest('.env-head')) {
-            startDragEnv(e, env);
-            e.stopPropagation(); // Impede que o canvas receba o evento
-          }
+          if(e.target.closest('input, textarea, button, .etiqueta-thumb, .env-name, .color-dot, .team-item')) return;
+          if(e.target.closest('.env-head')) { startDragEnv(e, env); e.stopPropagation(); }
         });
       }
 
@@ -245,10 +282,7 @@
 
   function renderContent(el, env) {
     const isOpen = env.isOpen;
-    
-    // Tooltip
     const tooltipHTML = `<div class="env-tooltip"><div class="tt-title">${env.name}</div><div class="tt-info">ID: ${env.id}</div><div class="tt-info">${env.tags.length} Tags • ${env.team.length} Links</div></div>`;
-
     const headerHTML = `
       <div class="env-head">
         ${tooltipHTML}
@@ -282,8 +316,7 @@
         const isInternal = t.url && t.url.startsWith('env:');
         return `
         <div class="etiqueta ${isInternal ? 'is-link' : ''}" data-id="${t.id}">
-          <img src="${t.img}" class="etiqueta-thumb" title="${isInternal ? 'Ir para Envelope' : 'Abrir Link'}" 
-               onclick="handleTagClick('${t.url||''}')" 
+          <img src="${t.img}" class="etiqueta-thumb" title="Arraste para mover" 
                onerror="this.src='https://placehold.co/60x60/333/FFF?text=ERR'">
           <div class="etiqueta-info">
             <div style="display:flex;justify-content:space-between;align-items:center">
@@ -293,6 +326,7 @@
               <div style="display:flex;gap:4px">
                 <button class="btn btn-edit-tag" style="padding:2px 6px;font-size:11px">✏️</button>
                 <button class="btn btn-danger btn-del-tag" style="padding:2px 6px;font-size:11px">🗑️</button>
+                ${t.url ? `<button class="btn" onclick="handleTagClick('${t.url}')" style="padding:2px 6px;font-size:11px">↗</button>` : ''}
               </div>
             </div>
             <textarea class="etiqueta-text" placeholder="Comentários...">${t.text}</textarea>
@@ -391,6 +425,15 @@
       el.querySelectorAll('.etiqueta-text').forEach(inp => inp.oninput = e => { const t = env.tags.find(tag=>tag.id==e.target.closest('.etiqueta').dataset.id); if(t) t.text = e.target.value; });
       el.querySelectorAll('.btn-edit-tag').forEach(btn => btn.onclick = e => { const id = e.target.closest('.etiqueta').dataset.id; openEditor('tag', env.tags.find(t=>t.id==id), env); });
       el.querySelectorAll('.btn-del-tag').forEach(btn => btn.onclick = e => { if(confirm("Excluir?")) { const id = e.target.closest('.etiqueta').dataset.id; env.tags = env.tags.filter(t=>t.id!=id); env._forceUpdate=true; render(); } });
+      
+      el.querySelectorAll('.etiqueta-thumb').forEach(img => {
+        img.onpointerdown = (e) => {
+          e.preventDefault(); e.stopPropagation();
+          const tagId = img.closest('.etiqueta').dataset.id;
+          const tag = env.tags.find(t => t.id == tagId);
+          startDragTag(e, tag, env);
+        };
+      });
     }
   }
 
@@ -433,7 +476,53 @@
     }
   });
 
-  // --- DRAG & PAN (Mobile Fixed) ---
+  function startDragTag(e, tag, sourceEnv) {
+    const ghost = document.createElement('div'); ghost.className = 'ghost-tag';
+    ghost.innerHTML = `<img src="${tag.img}"><span>${tag.text || 'Etiqueta'}</span>`;
+    document.body.appendChild(ghost);
+    
+    const updateGhost = (x, y) => { ghost.style.left = (x + 15) + 'px'; ghost.style.top = (y + 15) + 'px'; };
+    updateGhost(e.clientX, e.clientY);
+    
+    let targetEnvId = null;
+
+    const move = (ev) => {
+      updateGhost(ev.clientX, ev.clientY);
+      ghost.style.display = 'none';
+      const elem = document.elementFromPoint(ev.clientX, ev.clientY);
+      ghost.style.display = 'flex';
+      
+      const envEl = elem ? elem.closest('.envelope') : null;
+      document.querySelectorAll('.envelope.drag-over').forEach(el => el.classList.remove('drag-over'));
+      
+      if (envEl && envEl.classList.contains('open') && envEl.id !== sourceEnv.id) {
+        targetEnvId = envEl.id;
+        envEl.classList.add('drag-over');
+      } else {
+        targetEnvId = null;
+      }
+    };
+
+    const up = () => {
+      window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up);
+      ghost.remove();
+      document.querySelectorAll('.envelope.drag-over').forEach(el => el.classList.remove('drag-over'));
+      
+      if (targetEnvId) {
+        const targetEnv = STATE.envelopes.find(e => e.id === targetEnvId);
+        if (targetEnv) {
+          sourceEnv.tags = sourceEnv.tags.filter(t => t.id !== tag.id);
+          targetEnv.tags.push(tag);
+          sourceEnv._forceUpdate = true;
+          targetEnv._forceUpdate = true;
+          render();
+        }
+      }
+    };
+    
+    window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
+  }
+
   function startDragEnv(e, env) { 
     e.preventDefault(); 
     const el = document.getElementById(env.id); el.style.zIndex = 200; 
@@ -451,7 +540,6 @@
 
   let panning=false, panS={};
   viewport.onpointerdown = e => { 
-    // Só inicia PAN se clicar direto no viewport (fundo)
     if(e.target !== viewport && e.target !== world) return;
     panning=true; viewport.classList.add('dragging'); panS={x:e.clientX, y:e.clientY, cx:STATE.cam.x, cy:STATE.cam.y}; viewport.setPointerCapture(e.pointerId); 
   };
@@ -459,7 +547,6 @@
   viewport.onpointerup = () => { panning=false; viewport.classList.remove('dragging'); };
   viewport.onwheel = e => { if(!e.ctrlKey)return; e.preventDefault(); const f=e.deltaY>0?0.9:1.1; STATE.cam.z=Math.max(0.2, Math.min(3, STATE.cam.z*f)); applyCam(); };
 
-  // --- Toolbar ---
   document.getElementById("btnAddEnv").onclick = () => { STATE.envelopes.push({id:`env-${Date.now()}`, name:"Novo", color:ENV_PALETTE[0], x: -STATE.cam.x+window.innerWidth/2-140, y: -STATE.cam.y+window.innerHeight/2-100, isOpen:true, team:[], tags:[]}); render(); };
   document.getElementById("btnExport").onclick = () => { const b=new Blob([`window.RDT_DATA = ${JSON.stringify(STATE, null, 2)};`], {type:"text/javascript"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="data.js"; a.click(); };
   document.getElementById("btnLoad").onclick = () => document.getElementById("fileInput").click();
