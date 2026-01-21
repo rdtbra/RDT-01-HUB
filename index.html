@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>RDT-01-HUB [v.: 0.13]</title>
+  <title>RDT-01-HUB [v.: 0.13.1]</title>
   <style>
     :root{
       --bg: #0f172a; --text: #e6e8ef; --radius: 12px; --accent: #6366f1;
@@ -130,7 +130,7 @@
   <button id="btnMenu" class="hamburger-btn">≡</button>
 
   <div class="toolbar" id="mainToolbar">
-    <span class="app-title">RDT-01-HUB [v.: 0.13]</span>
+    <span class="app-title">RDT-01-HUB [v.: 0.13.1]</span>
     <div class="search-box">
       <span class="search-icon">🔍</span>
       <input type="text" id="searchInput" class="search-input" placeholder="Buscar envelope...">
@@ -181,7 +181,7 @@
   let STATE = { cam: {x:0, y:0, z:1}, envelopes: [] };
   let editingCtx = null; 
   let isDraggingTag = false;
-  let selectedEnvLink = null; // Para o smart search
+  let selectedEnvLink = null; 
 
   const viewport = document.getElementById("viewport");
   const world = document.getElementById("world");
@@ -262,7 +262,6 @@
     const isOpen = env.isOpen;
     const tooltipHTML = `<div class="env-tooltip"><div class="tt-title">${env.name}</div><div class="tt-info">ID: ${env.id}</div><div class="tt-info">${env.tags.length} Tags • ${env.team.length} Links</div></div>`;
     
-    // Botão Abrir Transparente (class btn, sem btn-primary)
     const headerHTML = `
       <div class="env-head">
         ${tooltipHTML}
@@ -270,7 +269,7 @@
         <div style="display:flex; gap:6px;">
           <button class="btn btn-danger btn-del-env" style="padding:4px 8px; height:28px">🗑️</button>
           ${!isOpen 
-            ? `<button class="btn btn-open" style="padding:4px 8px; height:28px">📂</button>` 
+            ? `<button class="btn btn-open" style="padding:4px 8px; height:28px; background:transparent; border:1px solid var(--border)">📂</button>` 
             : `<button class="btn btn-close" style="padding:4px 8px; height:28px">✖</button>`}
         </div>
       </div>`;
@@ -320,7 +319,10 @@
         <div class="env-open">
           <div class="col-left">
             <div class="cover-wrapper">${env.icon ? `<img src="${env.icon}" class="cover-img">` : '<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#666">Sem Capa</span>'}</div>
-            <button class="btn btn-change-cover" style="width:100%;justify-content:center;padding:6px;font-size:12px">🖼️ Alterar Capa</button>
+            
+            <!-- Botão Alterar Capa Pequeno -->
+            <button class="btn btn-change-cover" style="width:100%; justify-content:center; padding: 2px; font-size: 10px; height: 20px; background: transparent; border: 1px dashed var(--border); color: #aaa;">🖼️ Alterar Capa</button>
+            
             <div class="color-picker">${ENV_PALETTE.map(c => `<div class="color-dot ${env.color===c?'selected':''}" style="background:${c}" data-c="${c}"></div>`).join('')}</div>
             <textarea class="desc-area" placeholder="Descrição geral...">${env.description||''}</textarea>
           </div>
@@ -443,7 +445,6 @@
       document.getElementById("modalTitle").innerText = "Editar Etiqueta";
       reorderDiv.style.display = 'flex';
       
-      // Nome do envelope atual (se houver link)
       let currentLinkName = "";
       if(item.targetEnvId) {
         const found = STATE.envelopes.find(e => e.id == item.targetEnvId);
@@ -463,7 +464,6 @@
         <div class="form-group"><label>URL Imagem</label><input id="inpImg" value="${item.img||''}"></div>
       `;
       
-      // Lógica de Smart Search
       const inpSearch = document.getElementById('inpEnvSearch');
       const list = document.getElementById('envSearchResults');
       
@@ -489,10 +489,8 @@
         }
       };
       
-      // Limpar seleção se apagar texto
       inpSearch.onchange = () => { if(!inpSearch.value) selectedEnvLink = null; };
 
-      // Bind Reorder
       document.getElementById("btnMoveTop").onclick = () => moveTag(item, 'top', env);
       document.getElementById("btnMoveUp").onclick = () => moveTag(item, 'up', env);
       document.getElementById("btnMoveDown").onclick = () => moveTag(item, 'down', env);
@@ -513,7 +511,7 @@
         item.text = document.getElementById("inpText").value; 
         item.url = document.getElementById("inpUrl").value; 
         item.img = document.getElementById("inpImg").value; 
-        item.targetEnvId = selectedEnvLink; // Salva o ID selecionado no smart search
+        item.targetEnvId = selectedEnvLink; 
       }
       env._forceUpdate = true; render();
     }
