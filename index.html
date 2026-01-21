@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>RDT HUB — v9 Minimalist</title>
+  <title>RDT HUB — v10 Conexões</title>
   <style>
     :root{
       --bg: #0f172a; --text: #e6e8ef; --radius: 12px; --accent: #6366f1;
@@ -98,7 +98,6 @@
     .tt-title { font-weight: bold; color: #fff; font-size: 13px; }
     .tt-info { font-size: 11px; color: #94a3b8; }
 
-    /* Body Fechado (Redesenhado) */
     .env-closed { padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
     .env-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 6px; background: #000; border: 1px solid var(--border); cursor: pointer; }
     .env-stats { font-size: 11px; color: #94a3b8; text-align: center; }
@@ -250,7 +249,6 @@
           if(e.target.closest('input, textarea, button, .etiqueta-thumb, .env-name, .color-dot, .team-item')) return;
           if(e.target.closest('.env-head')) { startDragEnv(e, env); e.stopPropagation(); }
         });
-        // Double click na imagem para abrir
         el.addEventListener("dblclick", e => {
           if(e.target.classList.contains('env-thumb')) {
              env.isOpen = true; env._forceUpdate = true; render();
@@ -277,7 +275,6 @@
     const isOpen = env.isOpen;
     const tooltipHTML = `<div class="env-tooltip"><div class="tt-title">${env.name}</div><div class="tt-info">ID: ${env.id}</div><div class="tt-info">${env.tags.length} Tags • ${env.team.length} Links</div></div>`;
     
-    // Header com Botão Abrir/Fechar
     const headerHTML = `
       <div class="env-head">
         ${tooltipHTML}
@@ -321,6 +318,7 @@
                 ${isInternal ? '🔗 Link Interno' : (t.url ? '↗ Externo' : 'Sem Link')}
               </span>
               <div style="display:flex;gap:4px">
+                <button class="btn btn-link-tag" style="padding:2px 6px;font-size:11px" title="Conectar a Envelope">🔗</button>
                 <button class="btn btn-edit-tag" style="padding:2px 6px;font-size:11px">✏️</button>
                 <button class="btn btn-danger btn-del-tag" style="padding:2px 6px;font-size:11px">🗑️</button>
               </div>
@@ -423,6 +421,13 @@
       el.querySelectorAll('.btn-edit-tag').forEach(btn => btn.onclick = e => { const id = e.target.closest('.etiqueta').dataset.id; openEditor('tag', env.tags.find(t=>t.id==id), env); });
       el.querySelectorAll('.btn-del-tag').forEach(btn => btn.onclick = e => { if(confirm("Excluir?")) { const id = e.target.closest('.etiqueta').dataset.id; env.tags = env.tags.filter(t=>t.id!=id); env._forceUpdate=true; render(); } });
       
+      // NOVO: Botão de Conexão (Link)
+      el.querySelectorAll('.btn-link-tag').forEach(btn => btn.onclick = e => {
+        const id = e.target.closest('.etiqueta').dataset.id;
+        const tag = env.tags.find(t => t.id == id);
+        openConnectModal(tag, env);
+      });
+
       el.querySelectorAll('.etiqueta-thumb').forEach(img => {
         img.onpointerdown = (e) => {
           e.preventDefault(); e.stopPropagation();
@@ -434,6 +439,31 @@
     }
   }
 
+  // --- MODAL DE CONEXÃO (NOVO) ---
+  function openConnectModal(tag, env) {
+    editingCtx = { type: 'connect', item: tag, env: env };
+    document.getElementById("modalTitle").innerText = "Conectar a Envelope";
+    
+    // Filtra para não mostrar o próprio envelope
+    const options = STATE.envelopes
+      .filter(e => e.id !== env.id)
+      .map(e => `<option value="env:${e.id}">${e.name}</option>`)
+      .join('');
+
+    const fields = document.getElementById("modalFields");
+    fields.innerHTML = `
+      <div class="form-group">
+        <label>Escolha o Envelope de Destino:</label>
+        <select id="inpConnect" style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid #fff;color:#fff;border-radius:6px">
+          <option value="">-- Selecione --</option>
+          ${options}
+        </select>
+      </div>
+      <p style="font-size:12px;color:#aaa;margin-top:10px">Isso fará com que clicar na imagem desta etiqueta leve diretamente ao envelope escolhido.</p>
+    `;
+    modal.classList.remove("hidden");
+  }
+
   function openEditor(type, item, env) {
     editingCtx = { type, item, env };
     const fields = document.getElementById("modalFields");
@@ -442,10 +472,8 @@
       fields.innerHTML = `<div class="form-row"><div class="form-group" style="flex:0 0 80px"><label>Código</label><input id="inpCode" value="${item.code||''}"></div><div class="form-group"><label>Rótulo</label><input id="inpLabel" value="${item.label||''}"></div></div><div class="form-group"><label>URL</label><input id="inpUrl" value="${item.url||''}"></div>`;
     } else {
       document.getElementById("modalTitle").innerText = "Editar Etiqueta";
-      const envOptions = STATE.envelopes.map(e => `<option value="env:${e.id}">${e.name}</option>`).join('');
       fields.innerHTML = `
         <div class="form-group"><label>Texto</label><input id="inpText" value="${item.text||''}"></div>
-        <div class="form-group"><label>🔗 Linkar para Envelope</label><select id="inpEnvLink" onchange="if(this.value) document.getElementById('inpUrl').value = this.value"><option value="">-- Selecione --</option>${envOptions}</select></div>
         <div class="form-group"><label>URL Destino</label><input id="inpUrl" value="${item.url||''}"></div>
         <div class="form-group"><label>URL Imagem</label><input id="inpImg" value="${item.img||''}"></div>
       `;
@@ -457,8 +485,18 @@
   document.getElementById("btnSaveModal").onclick = () => {
     if (editingCtx) {
       const { type, item, env } = editingCtx;
-      if (type === 'team') { item.code = document.getElementById("inpCode").value; item.label = document.getElementById("inpLabel").value; item.url = document.getElementById("inpUrl").value; } 
-      else { item.text = document.getElementById("inpText").value; item.url = document.getElementById("inpUrl").value; item.img = document.getElementById("inpImg").value; }
+      if (type === 'connect') {
+        const val = document.getElementById("inpConnect").value;
+        if(val) item.url = val;
+      } else if (type === 'team') { 
+        item.code = document.getElementById("inpCode").value; 
+        item.label = document.getElementById("inpLabel").value; 
+        item.url = document.getElementById("inpUrl").value; 
+      } else { 
+        item.text = document.getElementById("inpText").value; 
+        item.url = document.getElementById("inpUrl").value; 
+        item.img = document.getElementById("inpImg").value; 
+      }
       env._forceUpdate = true; render();
     }
     modal.classList.add("hidden");
