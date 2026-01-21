@@ -1,7 +1,7 @@
 window.RDT_DATA = {
   "cam": {
-    "x": 224.59190429199202,
-    "y": 88.73565629638665,
+    "x": -2006.0495752001955,
+    "y": 445.56597856201165,
     "z": 0.9055075282577058
   },
   "envelopes": [
@@ -24,7 +24,7 @@ window.RDT_DATA = {
         {
           "id": 1,
           "text": "EMT-03-MA - Axler - PreCalculus a Prelude to Calculus 3ed",
-          "url": "https://ereader.perlego.com/1/book/3866265/28",
+          "url": "env:env-1768999052673",
           "img": "https://img.perlego.com/book-covers/3866265/9781119334767_300_450.webp"
         },
         {
@@ -251,6 +251,43 @@ window.RDT_DATA = {
       "tags": [],
       "_forceUpdate": false,
       "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiyH9oXg8gqbdBrbfun3jXBAN5C5R0NVL-4g&s"
+    },
+    {
+      "id": "env-1768999052673",
+      "name": "Axler - PreCalculus a Prelude to Calculus 3ed",
+      "color": "#1e293b",
+      "x": 3118.4188639837894,
+      "y": -286.20231282951914,
+      "isOpen": false,
+      "team": [],
+      "tags": [
+        {
+          "id": 1768999226195,
+          "text": "0 - The Real Numbers",
+          "url": "",
+          "img": "https://placehold.co/60x60/333/FFF?text=IMG"
+        },
+        {
+          "id": 1768999260874,
+          "text": "0.1 - The Real Line",
+          "url": "",
+          "img": "https://placehold.co/60x60/333/FFF?text=IMG"
+        },
+        {
+          "id": 1768999274435,
+          "text": "0.2 - Algebra of the Real Numbers",
+          "url": "",
+          "img": "https://placehold.co/60x60/333/FFF?text=IMG"
+        },
+        {
+          "id": 1768999296746,
+          "text": "0.3 Inequalities, Intervals and Absolute Value",
+          "url": "",
+          "img": "https://placehold.co/60x60/333/FFF?text=IMG"
+        }
+      ],
+      "_forceUpdate": false,
+      "icon": "https://img.perlego.com/book-covers/3866265/9781119334767_300_450.webp"
     }
   ]
 };
