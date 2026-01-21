@@ -1,7 +1,7 @@
 window.RDT_DATA = {
   "cam": {
-    "x": -2258.1259257513675,
-    "y": 83.02306020500737,
+    "x": 125.5718281548825,
+    "y": 62.19282949211674,
     "z": 1
   },
   "envelopes": [
@@ -69,7 +69,7 @@ window.RDT_DATA = {
       "color": "#1e293b",
       "x": 381.68519188314485,
       "y": -14.490038061992266,
-      "isOpen": true,
+      "isOpen": false,
       "team": [],
       "tags": [
         {
@@ -299,9 +299,9 @@ window.RDT_DATA = {
       "id": "env-1769017048980",
       "name": "Tipler&Mosca - Physics for Scientists and Engineers 6ed [EMT-02-FS]",
       "color": "#1e293b",
-      "x": 2942.6259257513675,
+      "x": 2945.34284469668,
       "y": 22.47693979499263,
-      "isOpen": true,
+      "isOpen": false,
       "team": [],
       "tags": [
         {
@@ -328,6 +328,35 @@ window.RDT_DATA = {
       ],
       "_forceUpdate": false,
       "icon": "assets/icons/EMT/EMT-02-FS.png"
+    }
+  ],
+  "markers": [
+    {
+      "id": "mk-1769020229121",
+      "type": "text",
+      "content": "EMT",
+      "x": 937.9279887396488,
+      "y": 212.89210092780513,
+      "size": 15,
+      "color": "#207942"
+    },
+    {
+      "id": "mk-1769020461282",
+      "type": "text",
+      "content": "Física",
+      "x": 2846.1544291693363,
+      "y": 27.231731054758257,
+      "size": 15,
+      "color": "#f50f0f"
+    },
+    {
+      "id": "mk-1769020501922",
+      "type": "text",
+      "content": "Matemática",
+      "x": 2784.5693461615238,
+      "y": -216.39094960930424,
+      "size": 15,
+      "color": "#0bef31"
     }
   ]
 };
