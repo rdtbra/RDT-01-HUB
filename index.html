@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>RDT HUB — v8.1 Final</title>
+  <title>RDT HUB — v9 Minimalist</title>
   <style>
     :root{
       --bg: #0f172a; --text: #e6e8ef; --radius: 12px; --accent: #6366f1;
@@ -60,7 +60,7 @@
 
     /* --- ENVELOPE --- */
     .envelope{
-      position:absolute; width:280px; border-radius: var(--radius);
+      position:absolute; width:260px; border-radius: var(--radius);
       background: var(--card-bg); border: 1px solid var(--border);
       box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column;
       transition: box-shadow 0.2s, border-color 0.2s; touch-action: none; 
@@ -75,15 +75,15 @@
     @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(99,102,241,0.7)} 70%{box-shadow:0 0 0 20px rgba(99,102,241,0)} 100%{box-shadow:0 0 0 0 rgba(99,102,241,0)} }
 
     .env-head{
-      height: 45px; display:flex; justify-content:space-between; align-items:center;
-      padding: 0 10px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border);
+      height: 40px; display:flex; justify-content:space-between; align-items:center;
+      padding: 0 8px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border);
       cursor: grab; border-radius: var(--radius) var(--radius) 0 0; position: relative;
     }
     .env-head:active { cursor: grabbing; }
     
     .env-title-wrapper { flex: 1; overflow: hidden; margin-right: 10px; }
     .env-name { 
-      font-weight: 700; padding: 2px 6px; border-radius: 4px; cursor: text; font-size: 14px;
+      font-weight: 700; padding: 2px 6px; border-radius: 4px; cursor: text; font-size: 13px;
       display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .env-name:focus { background: rgba(0,0,0,0.8); cursor: text; white-space: normal; overflow: visible; position: relative; z-index: 10; }
@@ -98,8 +98,10 @@
     .tt-title { font-weight: bold; color: #fff; font-size: 13px; }
     .tt-info { font-size: 11px; color: #94a3b8; }
 
-    .env-closed { padding: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-    .env-thumb { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; background: #000; border: 1px solid var(--border); }
+    /* Body Fechado (Redesenhado) */
+    .env-closed { padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .env-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 6px; background: #000; border: 1px solid var(--border); cursor: pointer; }
+    .env-stats { font-size: 11px; color: #94a3b8; text-align: center; }
     
     .env-open { display: flex; flex: 1; overflow: hidden; background: rgba(255,255,255,0.02); flex-direction: row; }
     @media (max-width: 768px) { .env-open { flex-direction: column; } .col-left { width: 100% !important; height: auto; max-height: 200px; border-right: none; border-bottom: 1px solid var(--border); } }
@@ -126,8 +128,8 @@
     .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 10px; }
     .etiqueta { display: flex; gap: 10px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; position: relative; }
     .etiqueta.is-link { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
-    .etiqueta-thumb { width: 60px; height: 60px; background: #000; border-radius: 6px; flex-shrink: 0; cursor: pointer; border: 1px solid var(--border); object-fit: cover; }
-    .etiqueta-thumb:hover { opacity: 0.8; }
+    .etiqueta-thumb { width: 60px; height: 60px; background: #000; border-radius: 6px; flex-shrink: 0; cursor: grab; border: 1px solid var(--border); object-fit: cover; }
+    .etiqueta-thumb:active { cursor: grabbing; }
     .etiqueta-info { flex: 1; display: flex; flex-direction: column; gap: 5px; }
     .etiqueta-text { width: 100%; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; height: 100%; }
 
@@ -151,28 +153,22 @@
   <input type="file" id="fileInput" accept=".js" style="display:none">
   <input type="file" id="fileInputLegacy" accept=".js,.txt" style="display:none">
 
-  <!-- BOTÃO HAMBURGUER (Fixo) -->
   <button id="btnMenu" class="hamburger-btn">≡</button>
 
-  <!-- MENU (Toolbar Escondida) -->
   <div class="toolbar" id="mainToolbar">
     <span class="app-title">RDT-01-HUB</span>
-    
     <div class="search-box">
       <span class="search-icon">🔍</span>
       <input type="text" id="searchInput" class="search-input" placeholder="Buscar envelope...">
     </div>
-
     <div class="toolbar-row">
       <button class="btn btn-primary" id="btnAddEnv"><span>➕</span> Novo</button>
       <button class="btn" id="btnExport">💾 Salvar</button>
     </div>
-
     <div class="toolbar-row">
       <button class="btn" id="btnZoomIn">🔍+</button>
       <button class="btn" id="btnZoomOut">🔍-</button>
     </div>
-
     <div class="toolbar-row">
       <button class="btn" id="btnImportLegacy">📦 Migrar</button>
       <button class="btn" id="btnLoad">📂 Abrir</button>
@@ -199,7 +195,7 @@
   const ENV_PALETTE = ["#1e293b", "#312e81", "#7f1d1d", "#78350f", "#064e3b", "#831843", "#000000"];
   let STATE = { cam: {x:0, y:0, z:1}, envelopes: [] };
   let editingCtx = null; 
-  let isDraggingTag = false; // Flag para evitar conflito click/drag
+  let isDraggingTag = false;
 
   const viewport = document.getElementById("viewport");
   const world = document.getElementById("world");
@@ -224,14 +220,12 @@
     render();
   }
 
-  // --- MENU LOGIC ---
   btnMenu.onclick = () => {
     mainToolbar.classList.toggle("show");
     btnMenu.classList.toggle("active");
     btnMenu.innerText = mainToolbar.classList.contains("show") ? "✖" : "≡";
   };
 
-  // --- ZOOM BUTTONS ---
   function zoomManual(factor) {
     const rect = viewport.getBoundingClientRect();
     const cx = rect.width / 2;
@@ -256,6 +250,12 @@
           if(e.target.closest('input, textarea, button, .etiqueta-thumb, .env-name, .color-dot, .team-item')) return;
           if(e.target.closest('.env-head')) { startDragEnv(e, env); e.stopPropagation(); }
         });
+        // Double click na imagem para abrir
+        el.addEventListener("dblclick", e => {
+          if(e.target.classList.contains('env-thumb')) {
+             env.isOpen = true; env._forceUpdate = true; render();
+          }
+        });
       }
 
       el.style.left = env.x + "px"; el.style.top = env.y + "px";
@@ -276,14 +276,17 @@
   function renderContent(el, env) {
     const isOpen = env.isOpen;
     const tooltipHTML = `<div class="env-tooltip"><div class="tt-title">${env.name}</div><div class="tt-info">ID: ${env.id}</div><div class="tt-info">${env.tags.length} Tags • ${env.team.length} Links</div></div>`;
+    
+    // Header com Botão Abrir/Fechar
     const headerHTML = `
       <div class="env-head">
         ${tooltipHTML}
         <div class="env-title-wrapper"><span class="env-name" contenteditable="true" spellcheck="false">${env.name}</span></div>
         <div style="display:flex; gap:6px;">
-          ${!isOpen ? `<span style="font-size:12px;opacity:0.7">${env.tags.length} Tags</span>` : ''}
-          <button class="btn btn-danger btn-del-env" style="padding:4px 8px">🗑️</button>
-          ${isOpen ? `<button class="btn btn-close" style="padding:4px 8px">✖</button>` : ''}
+          <button class="btn btn-danger btn-del-env" style="padding:4px 8px; height:28px">🗑️</button>
+          ${!isOpen 
+            ? `<button class="btn btn-primary btn-open" style="padding:4px 8px; height:28px">📂</button>` 
+            : `<button class="btn btn-close" style="padding:4px 8px; height:28px">✖</button>`}
         </div>
       </div>`;
 
@@ -291,7 +294,7 @@
       el.innerHTML = headerHTML + `
         <div class="env-closed">
           ${env.icon ? `<img src="${env.icon}" class="env-thumb">` : '<div class="env-thumb" style="display:flex;align-items:center;justify-content:center;color:#666">Sem Capa</div>'}
-          <button class="btn btn-primary btn-open" style="width:100%">Abrir</button>
+          <div class="env-stats">${env.tags.length} etiquetas • ${env.team.length} IAs</div>
         </div>`;
     } else {
       const teamHTML = env.team.map((m, i) => `
@@ -356,7 +359,7 @@
   }
 
   window.handleTagClick = (url) => {
-    if (isDraggingTag) return; // Se estiver arrastando, ignora o clique
+    if (isDraggingTag) return;
     if (!url) return;
     if (url.startsWith('env:')) {
       const targetId = url.split(':')[1];
@@ -483,7 +486,7 @@
 
     const move = (ev) => {
       hasMoved = true;
-      isDraggingTag = true; // Bloqueia o clique
+      isDraggingTag = true;
       updateGhost(ev.clientX, ev.clientY);
       ghost.style.display = 'none';
       const elem = document.elementFromPoint(ev.clientX, ev.clientY);
@@ -505,7 +508,6 @@
       ghost.remove();
       document.querySelectorAll('.envelope.drag-over').forEach(el => el.classList.remove('drag-over'));
       
-      // Libera o clique após um pequeno delay
       setTimeout(() => isDraggingTag = false, 100);
 
       if (hasMoved && targetEnvId) {
