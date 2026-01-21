@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>RDT-01-HUB [v.: 0.13.1]</title>
+  <title>RDT-01-HUB [v.: 0.13.2]</title>
   <style>
     :root{
       --bg: #0f172a; --text: #e6e8ef; --radius: 12px; --accent: #6366f1;
@@ -26,6 +26,23 @@
     .btn:active { background: rgba(255,255,255,0.2); }
     .btn-primary { background: var(--accent); border-color: transparent; color: white; }
     
+    /* Botão Micro (Correção solicitada) */
+    .btn-micro {
+      width: 100%;
+      padding: 4px 0; /* Padding vertical mínimo */
+      font-size: 11px;
+      background: transparent;
+      border: 1px dashed rgba(255,255,255,0.2);
+      color: #94a3b8;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: -4px; /* Aproxima da imagem */
+      transition: all 0.2s;
+      height: auto; /* Remove altura forçada */
+      flex: 0 0 auto; /* Impede de crescer no flexbox */
+    }
+    .btn-micro:hover { border-color: var(--accent); color: #fff; background: rgba(255,255,255,0.05); }
+
     .search-box { position: relative; width: 100%; }
     .search-input { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px 8px 30px; color: #fff; width: 100%; font-size: 14px; }
     .search-input:focus { border-color: var(--accent); }
@@ -61,17 +78,29 @@
     .env-open { display: flex; flex: 1; overflow: hidden; background: rgba(255,255,255,0.02); flex-direction: row; }
     @media (max-width: 768px) { .env-open { flex-direction: column; } .col-left { width: 100% !important; height: auto; max-height: 200px; border-right: none; border-bottom: 1px solid var(--border); } }
 
-    .col-left { width: 300px; padding: 15px; border-right: 1px solid var(--border); background: rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
+    /* Layout da Coluna Esquerda Ajustado */
+    .col-left { 
+      width: 300px; padding: 12px; border-right: 1px solid var(--border); 
+      background: rgba(0,0,0,0.2); display: flex; flex-direction: column; 
+      gap: 8px; /* Gap reduzido para economizar espaço */
+      overflow-y: auto; 
+    }
     .col-right { flex: 1; display: flex; flex-direction: column; background: #1e293b; overflow: hidden; }
 
     .cover-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; position: relative; flex-shrink: 0; }
     .cover-img { width: 100%; height: 100%; object-fit: cover; }
-    .color-picker { display: flex; gap: 8px; justify-content: center; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; flex-wrap: wrap; }
+    
+    .color-picker { display: flex; gap: 8px; justify-content: center; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 8px; flex-wrap: wrap; flex-shrink: 0; }
     .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); }
     .color-dot.selected { border-color: #fff; box-shadow: 0 0 0 2px #fff; }
     
-    /* Área de descrição expandida */
-    .desc-area { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 6px; resize: none; font-size: 13px; min-height: 150px; }
+    /* Descrição com flex: 1 para ocupar todo o resto */
+    .desc-area { 
+      flex: 1; /* Ocupa o espaço restante */
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border); 
+      color: #fff; padding: 10px; border-radius: 6px; resize: none; 
+      font-size: 13px; min-height: 100px; 
+    }
 
     .tabs-head { display: flex; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); overflow-x: auto; }
     .tab-btn { padding: 12px 24px; background: transparent; border: none; color: rgba(255,255,255,0.6); cursor: pointer; border-bottom: 3px solid transparent; font-weight: 600; white-space: nowrap; }
@@ -82,7 +111,6 @@
     .team-item { display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; margin-bottom: 6px; border: 1px solid transparent; }
     .team-code { font-family: monospace; font-size: 11px; background: rgba(99,102,241,0.2); color: #a5b4fc; padding: 2px 6px; border-radius: 4px; min-width: 35px; text-align: center; }
 
-    /* Etiquetas */
     .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 10px; }
     .etiqueta { display: flex; gap: 10px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; position: relative; transition: transform 0.2s; }
     .etiqueta.has-link { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
@@ -107,7 +135,6 @@
     .form-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; font-weight: 600; }
     .form-group input, .form-group select { width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; border-radius: 6px; }
 
-    /* Smart Search Dropdown */
     .search-results-list {
       position: absolute; top: 100%; left: 0; right: 0;
       background: #0f172a; border: 1px solid var(--accent);
@@ -130,7 +157,7 @@
   <button id="btnMenu" class="hamburger-btn">≡</button>
 
   <div class="toolbar" id="mainToolbar">
-    <span class="app-title">RDT-01-HUB [v.: 0.13.1]</span>
+    <span class="app-title">RDT-01-HUB [v.: 0.13.2]</span>
     <div class="search-box">
       <span class="search-icon">🔍</span>
       <input type="text" id="searchInput" class="search-input" placeholder="Buscar envelope...">
@@ -320,8 +347,8 @@
           <div class="col-left">
             <div class="cover-wrapper">${env.icon ? `<img src="${env.icon}" class="cover-img">` : '<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#666">Sem Capa</span>'}</div>
             
-            <!-- Botão Alterar Capa Pequeno -->
-            <button class="btn btn-change-cover" style="width:100%; justify-content:center; padding: 2px; font-size: 10px; height: 20px; background: transparent; border: 1px dashed var(--border); color: #aaa;">🖼️ Alterar Capa</button>
+            <!-- Botão Micro Corrigido -->
+            <button class="btn-micro btn-change-cover">🖼️ Alterar Capa</button>
             
             <div class="color-picker">${ENV_PALETTE.map(c => `<div class="color-dot ${env.color===c?'selected':''}" style="background:${c}" data-c="${c}"></div>`).join('')}</div>
             <textarea class="desc-area" placeholder="Descrição geral...">${env.description||''}</textarea>
