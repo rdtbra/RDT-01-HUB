@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>RDT HUB — v13 Reorder</title>
+  <title>RDT-01-HUB [v.: 0.13]</title>
   <style>
     :root{
       --bg: #0f172a; --text: #e6e8ef; --radius: 12px; --accent: #6366f1;
@@ -69,7 +69,9 @@
     .color-picker { display: flex; gap: 8px; justify-content: center; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; flex-wrap: wrap; }
     .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); }
     .color-dot.selected { border-color: #fff; box-shadow: 0 0 0 2px #fff; }
-    .desc-area { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 6px; resize: none; font-size: 13px; min-height: 80px; }
+    
+    /* Área de descrição expandida */
+    .desc-area { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 6px; resize: none; font-size: 13px; min-height: 150px; }
 
     .tabs-head { display: flex; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); overflow-x: auto; }
     .tab-btn { padding: 12px 24px; background: transparent; border: none; color: rgba(255,255,255,0.6); cursor: pointer; border-bottom: 3px solid transparent; font-weight: 600; white-space: nowrap; }
@@ -84,7 +86,6 @@
     .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 10px; }
     .etiqueta { display: flex; gap: 10px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; position: relative; transition: transform 0.2s; }
     .etiqueta.has-link { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
-    /* Estilo para quando está sendo arrastado por cima para troca */
     .etiqueta.drag-swap { border-color: var(--success); background: rgba(34, 197, 94, 0.1); }
     
     .etiqueta-thumb { width: 60px; height: 60px; background: #000; border-radius: 6px; flex-shrink: 0; cursor: pointer; border: 1px solid var(--border); object-fit: cover; }
@@ -102,9 +103,19 @@
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
     .modal { background: #1e293b; width: 450px; padding: 25px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 25px 50px rgba(0,0,0,0.9); max-width: 90vw; }
     .form-row { display: flex; gap: 10px; margin-bottom: 15px; }
-    .form-group { margin-bottom: 15px; flex: 1; }
+    .form-group { margin-bottom: 15px; flex: 1; position: relative; }
     .form-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; font-weight: 600; }
     .form-group input, .form-group select { width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; border-radius: 6px; }
+
+    /* Smart Search Dropdown */
+    .search-results-list {
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: #0f172a; border: 1px solid var(--accent);
+      border-radius: 0 0 6px 6px; max-height: 150px; overflow-y: auto;
+      z-index: 100; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .search-item { padding: 8px 12px; cursor: pointer; font-size: 13px; color: #e2e8f0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .search-item:hover { background: var(--accent); color: white; }
 
     .hidden { display: none !important; }
   </style>
@@ -119,7 +130,7 @@
   <button id="btnMenu" class="hamburger-btn">≡</button>
 
   <div class="toolbar" id="mainToolbar">
-    <span class="app-title">RDT-01-HUB</span>
+    <span class="app-title">RDT-01-HUB [v.: 0.13]</span>
     <div class="search-box">
       <span class="search-icon">🔍</span>
       <input type="text" id="searchInput" class="search-input" placeholder="Buscar envelope...">
@@ -147,7 +158,6 @@
       <h3 id="modalTitle" style="margin-top:0; color:#fff; border-bottom:1px solid var(--border); padding-bottom:15px">Editar</h3>
       <div id="modalFields"></div>
       
-      <!-- Botões de Reordenação (Aparecem só para etiquetas) -->
       <div id="modalReorder" style="display:none; border-top:1px solid var(--border); padding-top:10px; margin-top:10px; justify-content:space-between; align-items:center;">
         <span style="font-size:12px; color:#aaa">Ordem:</span>
         <div style="display:flex; gap:5px">
@@ -171,6 +181,7 @@
   let STATE = { cam: {x:0, y:0, z:1}, envelopes: [] };
   let editingCtx = null; 
   let isDraggingTag = false;
+  let selectedEnvLink = null; // Para o smart search
 
   const viewport = document.getElementById("viewport");
   const world = document.getElementById("world");
@@ -251,6 +262,7 @@
     const isOpen = env.isOpen;
     const tooltipHTML = `<div class="env-tooltip"><div class="tt-title">${env.name}</div><div class="tt-info">ID: ${env.id}</div><div class="tt-info">${env.tags.length} Tags • ${env.team.length} Links</div></div>`;
     
+    // Botão Abrir Transparente (class btn, sem btn-primary)
     const headerHTML = `
       <div class="env-head">
         ${tooltipHTML}
@@ -258,7 +270,7 @@
         <div style="display:flex; gap:6px;">
           <button class="btn btn-danger btn-del-env" style="padding:4px 8px; height:28px">🗑️</button>
           ${!isOpen 
-            ? `<button class="btn btn-primary btn-open" style="padding:4px 8px; height:28px">📂</button>` 
+            ? `<button class="btn btn-open" style="padding:4px 8px; height:28px">📂</button>` 
             : `<button class="btn btn-close" style="padding:4px 8px; height:28px">✖</button>`}
         </div>
       </div>`;
@@ -308,7 +320,7 @@
         <div class="env-open">
           <div class="col-left">
             <div class="cover-wrapper">${env.icon ? `<img src="${env.icon}" class="cover-img">` : '<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#666">Sem Capa</span>'}</div>
-            <button class="btn btn-change-cover" style="width:100%;justify-content:center">🖼️ Alterar Capa</button>
+            <button class="btn btn-change-cover" style="width:100%;justify-content:center;padding:6px;font-size:12px">🖼️ Alterar Capa</button>
             <div class="color-picker">${ENV_PALETTE.map(c => `<div class="color-dot ${env.color===c?'selected':''}" style="background:${c}" data-c="${c}"></div>`).join('')}</div>
             <textarea class="desc-area" placeholder="Descrição geral...">${env.description||''}</textarea>
           </div>
@@ -408,25 +420,18 @@
   function moveTag(tag, direction, env) {
     const idx = env.tags.indexOf(tag);
     if (idx === -1) return;
-    
     const newTags = [...env.tags];
-    if (direction === 'top') {
-      newTags.splice(idx, 1); newTags.unshift(tag);
-    } else if (direction === 'bottom') {
-      newTags.splice(idx, 1); newTags.push(tag);
-    } else if (direction === 'up' && idx > 0) {
-      [newTags[idx], newTags[idx-1]] = [newTags[idx-1], newTags[idx]];
-    } else if (direction === 'down' && idx < newTags.length - 1) {
-      [newTags[idx], newTags[idx+1]] = [newTags[idx+1], newTags[idx]];
-    }
-    
-    env.tags = newTags;
-    env._forceUpdate = true;
-    render();
+    if (direction === 'top') { newTags.splice(idx, 1); newTags.unshift(tag); } 
+    else if (direction === 'bottom') { newTags.splice(idx, 1); newTags.push(tag); } 
+    else if (direction === 'up' && idx > 0) { [newTags[idx], newTags[idx-1]] = [newTags[idx-1], newTags[idx]]; } 
+    else if (direction === 'down' && idx < newTags.length - 1) { [newTags[idx], newTags[idx+1]] = [newTags[idx+1], newTags[idx]]; }
+    env.tags = newTags; env._forceUpdate = true; render();
   }
 
+  // --- SMART SEARCH EDITOR ---
   function openEditor(type, item, env) {
     editingCtx = { type, item, env };
+    selectedEnvLink = item.targetEnvId || null;
     const fields = document.getElementById("modalFields");
     const reorderDiv = document.getElementById("modalReorder");
     
@@ -437,15 +442,57 @@
     } else {
       document.getElementById("modalTitle").innerText = "Editar Etiqueta";
       reorderDiv.style.display = 'flex';
-      const envOptions = STATE.envelopes.map(e => `<option value="${e.id}" ${item.targetEnvId == e.id ? 'selected' : ''}>${e.name}</option>`).join('');
+      
+      // Nome do envelope atual (se houver link)
+      let currentLinkName = "";
+      if(item.targetEnvId) {
+        const found = STATE.envelopes.find(e => e.id == item.targetEnvId);
+        if(found) currentLinkName = found.name;
+      }
+
       fields.innerHTML = `
         <div class="form-group"><label>Texto</label><input id="inpText" value="${item.text||''}"></div>
         <div class="form-group"><label>URL do Recurso (Externo)</label><input id="inpUrl" value="${item.url||''}" placeholder="https://..."></div>
-        <div class="form-group"><label>Conectar a Envelope (Interno)</label><select id="inpEnvLink"><option value="">-- Nenhum --</option>${envOptions}</select></div>
+        
+        <div class="form-group">
+          <label>Conectar a Envelope (Interno)</label>
+          <input id="inpEnvSearch" placeholder="Digite para buscar..." value="${currentLinkName}" autocomplete="off">
+          <div id="envSearchResults" class="search-results-list"></div>
+        </div>
+
         <div class="form-group"><label>URL Imagem</label><input id="inpImg" value="${item.img||''}"></div>
       `;
       
-      // Bind Reorder Buttons
+      // Lógica de Smart Search
+      const inpSearch = document.getElementById('inpEnvSearch');
+      const list = document.getElementById('envSearchResults');
+      
+      inpSearch.oninput = (e) => {
+        const term = e.target.value.toLowerCase();
+        if(!term) { list.style.display = 'none'; return; }
+        
+        const matches = STATE.envelopes.filter(e => e.id !== env.id && e.name.toLowerCase().includes(term));
+        
+        if(matches.length) {
+          list.innerHTML = matches.map(e => `<div class="search-item" data-id="${e.id}">${e.name}</div>`).join('');
+          list.style.display = 'block';
+          
+          list.querySelectorAll('.search-item').forEach(div => {
+            div.onclick = () => {
+              inpSearch.value = div.innerText;
+              selectedEnvLink = div.dataset.id;
+              list.style.display = 'none';
+            };
+          });
+        } else {
+          list.style.display = 'none';
+        }
+      };
+      
+      // Limpar seleção se apagar texto
+      inpSearch.onchange = () => { if(!inpSearch.value) selectedEnvLink = null; };
+
+      // Bind Reorder
       document.getElementById("btnMoveTop").onclick = () => moveTag(item, 'top', env);
       document.getElementById("btnMoveUp").onclick = () => moveTag(item, 'up', env);
       document.getElementById("btnMoveDown").onclick = () => moveTag(item, 'down', env);
@@ -466,7 +513,7 @@
         item.text = document.getElementById("inpText").value; 
         item.url = document.getElementById("inpUrl").value; 
         item.img = document.getElementById("inpImg").value; 
-        item.targetEnvId = document.getElementById("inpEnvLink").value;
+        item.targetEnvId = selectedEnvLink; // Salva o ID selecionado no smart search
       }
       env._forceUpdate = true; render();
     }
@@ -491,7 +538,7 @@
     updateGhost(e.clientX, e.clientY);
     
     let targetEnvId = null;
-    let swapTargetId = null; // Para troca dentro do mesmo envelope
+    let swapTargetId = null; 
     let hasMoved = false;
 
     const move = (ev) => {
@@ -508,22 +555,14 @@
 
       if (envEl && envEl.classList.contains('open')) {
         targetEnvId = envEl.id;
-        
-        // Se estiver no mesmo envelope, tenta achar etiqueta para troca
         if (targetEnvId === sourceEnv.id) {
            const tagEl = elem.closest('.etiqueta');
            if (tagEl && tagEl.dataset.id != tag.id) {
              swapTargetId = parseInt(tagEl.dataset.id);
              tagEl.classList.add('drag-swap');
-           } else {
-             swapTargetId = null;
-           }
-        } else {
-           envEl.classList.add('drag-over');
-        }
-      } else {
-        targetEnvId = null;
-      }
+           } else { swapTargetId = null; }
+        } else { envEl.classList.add('drag-over'); }
+      } else { targetEnvId = null; }
     };
 
     const up = () => {
@@ -537,21 +576,17 @@
       if (hasMoved && targetEnvId) {
         const targetEnv = STATE.envelopes.find(e => e.id === targetEnvId);
         if (targetEnv) {
-          // Lógica de Troca (Swap) no mesmo envelope
           if (targetEnv.id === sourceEnv.id && swapTargetId) {
             const idx1 = sourceEnv.tags.findIndex(t => t.id === tag.id);
             const idx2 = sourceEnv.tags.findIndex(t => t.id === swapTargetId);
             if (idx1 > -1 && idx2 > -1) {
-              // Troca simples de posição
               const temp = sourceEnv.tags[idx1];
               sourceEnv.tags[idx1] = sourceEnv.tags[idx2];
               sourceEnv.tags[idx2] = temp;
               sourceEnv._forceUpdate = true;
               render();
             }
-          } 
-          // Lógica de Mover para outro envelope
-          else if (targetEnv.id !== sourceEnv.id) {
+          } else if (targetEnv.id !== sourceEnv.id) {
             sourceEnv.tags = sourceEnv.tags.filter(t => t.id !== tag.id);
             targetEnv.tags.push(tag);
             sourceEnv._forceUpdate = true;
