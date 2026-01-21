@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>RDT HUB — v8 Mobile Menu</title>
+  <title>RDT HUB — v8.1 Final</title>
   <style>
     :root{
       --bg: #0f172a; --text: #e6e8ef; --radius: 12px; --accent: #6366f1;
@@ -13,7 +13,7 @@
     html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;overflow:hidden;touch-action:none;}
     * { box-sizing: border-box; outline: none; user-select: none; -webkit-tap-highlight-color: transparent; }
 
-    /* --- HAMBURGUER (Botão Menu) --- */
+    /* --- HAMBURGUER --- */
     .hamburger-btn {
       position: fixed; top: 15px; left: 15px; z-index: 2100;
       width: 45px; height: 45px; border-radius: 50%;
@@ -25,15 +25,13 @@
     .hamburger-btn:active { transform: scale(0.9); }
     .hamburger-btn.active { background: var(--danger); }
 
-    /* --- TOOLBAR (Menu Expansível) --- */
+    /* --- TOOLBAR --- */
     .toolbar {
       position: fixed; top: 70px; left: 15px; z-index: 2000;
       background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border);
       padding: 12px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
       display: flex; flex-direction: column; gap: 10px; width: 260px;
       backdrop-filter: blur(10px);
-      
-      /* Animação de Entrada */
       transform: translateX(-120%); opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .toolbar.show { transform: translateX(0); opacity: 1; }
@@ -49,7 +47,6 @@
     .btn:active { background: rgba(255,255,255,0.2); }
     .btn-primary { background: var(--accent); border-color: transparent; color: white; }
     
-    /* Search */
     .search-box { position: relative; width: 100%; }
     .search-input { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px 8px 30px; color: #fff; width: 100%; font-size: 14px; }
     .search-input:focus { border-color: var(--accent); }
@@ -71,7 +68,7 @@
     .envelope.open {
       width: 950px; height: 600px; z-index: 100 !important;
       box-shadow: 0 50px 100px rgba(0,0,0,0.8); border-color: rgba(255,255,255,0.4);
-      max-width: 95vw; max-height: 85vh; /* Ajuste mobile */
+      max-width: 95vw; max-height: 85vh;
     }
     .envelope.highlight { animation: pulse 1.5s ease; border-color: var(--accent); z-index: 200; }
     .envelope.drag-over { border-color: #22c55e; box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.3); }
@@ -129,8 +126,8 @@
     .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 10px; }
     .etiqueta { display: flex; gap: 10px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; position: relative; }
     .etiqueta.is-link { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
-    .etiqueta-thumb { width: 60px; height: 60px; background: #000; border-radius: 6px; flex-shrink: 0; cursor: grab; border: 1px solid var(--border); object-fit: cover; }
-    .etiqueta-thumb:active { cursor: grabbing; }
+    .etiqueta-thumb { width: 60px; height: 60px; background: #000; border-radius: 6px; flex-shrink: 0; cursor: pointer; border: 1px solid var(--border); object-fit: cover; }
+    .etiqueta-thumb:hover { opacity: 0.8; }
     .etiqueta-info { flex: 1; display: flex; flex-direction: column; gap: 5px; }
     .etiqueta-text { width: 100%; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; height: 100%; }
 
@@ -202,6 +199,7 @@
   const ENV_PALETTE = ["#1e293b", "#312e81", "#7f1d1d", "#78350f", "#064e3b", "#831843", "#000000"];
   let STATE = { cam: {x:0, y:0, z:1}, envelopes: [] };
   let editingCtx = null; 
+  let isDraggingTag = false; // Flag para evitar conflito click/drag
 
   const viewport = document.getElementById("viewport");
   const world = document.getElementById("world");
@@ -235,20 +233,15 @@
 
   // --- ZOOM BUTTONS ---
   function zoomManual(factor) {
-    // Zoom em direção ao centro da tela
     const rect = viewport.getBoundingClientRect();
     const cx = rect.width / 2;
     const cy = rect.height / 2;
-    
     const wx = (cx - STATE.cam.x) / STATE.cam.z;
     const wy = (cy - STATE.cam.y) / STATE.cam.z;
-
     let newZ = Math.max(0.1, Math.min(5, STATE.cam.z * factor));
-    
     STATE.cam.x = cx - wx * newZ;
     STATE.cam.y = cy - wy * newZ;
     STATE.cam.z = newZ;
-    
     applyCam();
   }
   document.getElementById("btnZoomIn").onclick = () => zoomManual(1.2);
@@ -316,7 +309,8 @@
         const isInternal = t.url && t.url.startsWith('env:');
         return `
         <div class="etiqueta ${isInternal ? 'is-link' : ''}" data-id="${t.id}">
-          <img src="${t.img}" class="etiqueta-thumb" title="Arraste para mover" 
+          <img src="${t.img}" class="etiqueta-thumb" title="Abrir Link / Arrastar" 
+               onclick="handleTagClick('${t.url||''}')" 
                onerror="this.src='https://placehold.co/60x60/333/FFF?text=ERR'">
           <div class="etiqueta-info">
             <div style="display:flex;justify-content:space-between;align-items:center">
@@ -326,7 +320,6 @@
               <div style="display:flex;gap:4px">
                 <button class="btn btn-edit-tag" style="padding:2px 6px;font-size:11px">✏️</button>
                 <button class="btn btn-danger btn-del-tag" style="padding:2px 6px;font-size:11px">🗑️</button>
-                ${t.url ? `<button class="btn" onclick="handleTagClick('${t.url}')" style="padding:2px 6px;font-size:11px">↗</button>` : ''}
               </div>
             </div>
             <textarea class="etiqueta-text" placeholder="Comentários...">${t.text}</textarea>
@@ -363,6 +356,7 @@
   }
 
   window.handleTagClick = (url) => {
+    if (isDraggingTag) return; // Se estiver arrastando, ignora o clique
     if (!url) return;
     if (url.startsWith('env:')) {
       const targetId = url.split(':')[1];
@@ -485,8 +479,11 @@
     updateGhost(e.clientX, e.clientY);
     
     let targetEnvId = null;
+    let hasMoved = false;
 
     const move = (ev) => {
+      hasMoved = true;
+      isDraggingTag = true; // Bloqueia o clique
       updateGhost(ev.clientX, ev.clientY);
       ghost.style.display = 'none';
       const elem = document.elementFromPoint(ev.clientX, ev.clientY);
@@ -508,7 +505,10 @@
       ghost.remove();
       document.querySelectorAll('.envelope.drag-over').forEach(el => el.classList.remove('drag-over'));
       
-      if (targetEnvId) {
+      // Libera o clique após um pequeno delay
+      setTimeout(() => isDraggingTag = false, 100);
+
+      if (hasMoved && targetEnvId) {
         const targetEnv = STATE.envelopes.find(e => e.id === targetEnvId);
         if (targetEnv) {
           sourceEnv.tags = sourceEnv.tags.filter(t => t.id !== tag.id);
