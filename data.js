@@ -1,7 +1,7 @@
 window.RDT_DATA = {
   "cam": {
-    "x": 125.5718281548825,
-    "y": 62.19282949211674,
+    "x": 3226.5530903619137,
+    "y": 313.9664500975855,
     "z": 1
   },
   "envelopes": [
@@ -328,6 +328,17 @@ window.RDT_DATA = {
       ],
       "_forceUpdate": false,
       "icon": "assets/icons/EMT/EMT-02-FS.png"
+    },
+    {
+      "id": "env-1769020819611",
+      "name": "LLMs - convencionais pagas",
+      "color": "#1e293b",
+      "x": -2868.185200957617,
+      "y": -272.91930425407963,
+      "isOpen": true,
+      "team": [],
+      "tags": [],
+      "icon": "assets/icons/PES/LLMs-ConversacionalLic.svg"
     }
   ],
   "markers": [
