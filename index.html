@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>RDT-01-HUB [v.: 0.14]</title>
+  <title>RDT-01-HUB [v.: 0.14.1]</title>
   <style>
     :root{
       --bg: #0f172a; --text: #e6e8ef; --radius: 12px; --accent: #6366f1;
@@ -17,7 +17,7 @@
     .hamburger-btn { position: fixed; top: 15px; left: 15px; z-index: 2100; width: 45px; height: 45px; border-radius: 50%; background: var(--accent); border: none; color: white; font-size: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; transition: 0.2s; }
     .hamburger-btn:active { transform: scale(0.9); }
     
-    .toolbar { position: fixed; top: 70px; left: 15px; z-index: 2000; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border); padding: 12px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 10px; width: 260px; backdrop-filter: blur(10px); transform: translateX(-120%); opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .toolbar { position: fixed; top: 70px; left: 15px; z-index: 2000; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border); padding: 12px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 10px; width: 280px; backdrop-filter: blur(10px); transform: translateX(-120%); opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     .toolbar.show { transform: translateX(0); opacity: 1; }
     .toolbar-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .app-title { font-weight: 800; font-size: 16px; color: #fff; margin-bottom: 5px; display: block; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
@@ -29,39 +29,33 @@
     .btn-micro { width: 100%; padding: 4px 0; font-size: 11px; background: transparent; border: 1px dashed rgba(255,255,255,0.2); color: #94a3b8; border-radius: 4px; cursor: pointer; margin-top: -4px; transition: all 0.2s; height: auto; flex: 0 0 auto; }
     .btn-micro:hover { border-color: var(--accent); color: #fff; background: rgba(255,255,255,0.05); }
 
-    .search-box { position: relative; width: 100%; }
-    .search-input { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px 8px 30px; color: #fff; width: 100%; font-size: 14px; }
+    /* Search Box Aprimorado */
+    .search-box { position: relative; width: 100%; display: flex; gap: 5px; }
+    
+    .search-filter {
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px;
+      color: #fff; padding: 0 5px; font-size: 12px; cursor: pointer; width: 70px;
+    }
+    .search-filter:focus { border-color: var(--accent); }
+
+    .search-input { 
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; 
+      padding: 8px 10px; color: #fff; flex: 1; font-size: 14px; 
+    }
     .search-input:focus { border-color: var(--accent); }
-    .search-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 14px; opacity: 0.5; pointer-events: none; }
 
     /* --- CANVAS --- */
     .viewport{ width:100%; height:100%; position:relative; cursor:grab; overflow:hidden; background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 40px 40px; }
     .viewport.dragging{cursor:grabbing}
     .world{ position:absolute;left:0;top:0; transform-origin:0 0; will-change: transform; }
 
-    /* --- MARCADOR (NOVO) --- */
-    .marker {
-      position: absolute; cursor: grab; z-index: 50;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: transform 0.2s;
-    }
+    /* --- MARCADOR --- */
+    .marker { position: absolute; cursor: grab; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s; }
     .marker:hover { transform: scale(1.05); z-index: 51; }
     .marker.highlight { animation: pulseMarker 1.5s ease infinite; }
-    
-    /* Estilo Texto */
-    .marker-text { 
-      font-weight: 900; text-transform: uppercase; letter-spacing: 2px;
-      text-shadow: 0 4px 10px rgba(0,0,0,0.8); white-space: nowrap;
-      padding: 5px 10px; border-radius: 8px; border: 2px solid transparent;
-    }
+    .marker-text { font-weight: 900; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 4px 10px rgba(0,0,0,0.8); white-space: nowrap; padding: 5px 10px; border-radius: 8px; border: 2px solid transparent; }
     .marker:hover .marker-text { border-color: rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); }
-
-    /* Estilo Imagem */
-    .marker-img { 
-      object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); 
-      pointer-events: none; 
-    }
-
+    .marker-img { object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); pointer-events: none; }
     @keyframes pulseMarker { 0%{transform:scale(1)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
 
     /* --- ENVELOPE --- */
@@ -151,11 +145,18 @@
   <button id="btnMenu" class="hamburger-btn">≡</button>
 
   <div class="toolbar" id="mainToolbar">
-    <span class="app-title">RDT-01-HUB [v.: 0.14]</span>
+    <span class="app-title">RDT-01-HUB [v.: 0.14.1]</span>
+    
+    <!-- SEARCH BOX COM FILTRO -->
     <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" class="search-input" placeholder="Buscar envelope ou marcador...">
+      <select id="searchFilter" class="search-filter">
+        <option value="all">★ Todos</option>
+        <option value="env">✉️ Env</option>
+        <option value="marker">📍 Marc</option>
+      </select>
+      <input type="text" id="searchInput" class="search-input" placeholder="Buscar...">
     </div>
+
     <div class="toolbar-row">
       <button class="btn btn-primary" id="btnAddEnv"><span>➕</span> Novo</button>
       <button class="btn" id="btnAddMarker">📍 Marcador</button>
@@ -209,6 +210,7 @@
   const world = document.getElementById("world");
   const modal = document.getElementById("editModal");
   const searchInput = document.getElementById("searchInput");
+  const searchFilter = document.getElementById("searchFilter");
   const mainToolbar = document.getElementById("mainToolbar");
   const btnMenu = document.getElementById("btnMenu");
 
@@ -252,7 +254,7 @@
   document.getElementById("btnZoomOut").onclick = () => zoomManual(0.8);
 
   function render() {
-    world.innerHTML = ''; // Limpa tudo para redesenhar (simples e eficaz)
+    world.innerHTML = ''; 
 
     // Render Markers
     STATE.markers.forEach(mk => {
@@ -268,26 +270,9 @@
         el.innerHTML = `<div class="marker-text" style="font-size:${mk.size||24}px; color:${mk.color||'#fff'}">${mk.content}</div>`;
       }
 
-      // Drag Marker
-      el.onpointerdown = (e) => {
-        e.preventDefault(); e.stopPropagation();
-        startDragItem(e, mk, el);
-      };
-      
-      // Edit Marker
-      el.ondblclick = (e) => {
-        e.stopPropagation();
-        openEditor('marker', mk);
-      };
-
-      // Delete Marker (Right Click)
-      el.oncontextmenu = (e) => {
-        e.preventDefault();
-        if(confirm("Apagar Marcador?")) {
-          STATE.markers = STATE.markers.filter(m => m.id !== mk.id);
-          render();
-        }
-      };
+      el.onpointerdown = (e) => { e.preventDefault(); e.stopPropagation(); startDragItem(e, mk, el); };
+      el.ondblclick = (e) => { e.stopPropagation(); openEditor('marker', mk); };
+      el.oncontextmenu = (e) => { e.preventDefault(); if(confirm("Apagar Marcador?")) { STATE.markers = STATE.markers.filter(m => m.id !== mk.id); render(); } };
 
       world.appendChild(el);
     });
@@ -305,16 +290,12 @@
 
       renderContent(el, env);
       
-      // Drag Envelope
       el.onpointerdown = (e) => {
         if(e.target.closest('input, textarea, button, .etiqueta-thumb, .env-name, .color-dot, .team-item')) return;
         if(e.target.closest('.env-head')) { startDragItem(e, env, el); e.stopPropagation(); }
       };
       
-      // Open on Double Click Image
-      el.ondblclick = (e) => {
-        if(e.target.classList.contains('env-thumb')) { env.isOpen = true; render(); }
-      };
+      el.ondblclick = (e) => { if(e.target.classList.contains('env-thumb')) { env.isOpen = true; render(); } };
 
       world.appendChild(el);
     });
@@ -472,11 +453,10 @@
       el.querySelectorAll('.btn-edit-tag').forEach(btn => btn.onclick = e => { const id = e.target.closest('.etiqueta').dataset.id; openEditor('tag', env.tags.find(t=>t.id==id), env); });
       el.querySelectorAll('.btn-del-tag').forEach(btn => btn.onclick = e => { if(confirm("Excluir?")) { const id = e.target.closest('.etiqueta').dataset.id; env.tags = env.tags.filter(t=>t.id!=id); render(); } });
       
-      // NOVO: Botão de Conexão (Link)
       el.querySelectorAll('.btn-link-tag').forEach(btn => btn.onclick = e => {
         const id = e.target.closest('.etiqueta').dataset.id;
         const tag = env.tags.find(t => t.id == id);
-        openEditor('tag', tag, env); // Abre editor para conectar
+        openEditor('tag', tag, env); 
       });
 
       el.querySelectorAll('.etiqueta-thumb').forEach(img => {
@@ -490,7 +470,6 @@
     }
   }
 
-  // --- REORDER LOGIC ---
   function moveTag(tag, direction, env) {
     const idx = env.tags.indexOf(tag);
     if (idx === -1) return;
@@ -502,7 +481,6 @@
     env.tags = newTags; render();
   }
 
-  // --- EDITOR ---
   function openEditor(type, item, env) {
     editingCtx = { type, item, env };
     selectedEnvLink = item.targetEnvId || null;
@@ -586,22 +564,29 @@
     modal.classList.add("hidden");
   };
 
-  // --- SEARCH ---
+  // --- SEARCH LOGIC (REFINED) ---
   searchInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       const term = searchInput.value.toLowerCase();
-      // Search Envelopes
-      const targetEnv = STATE.envelopes.find(env => env.name.toLowerCase().includes(term));
-      if (targetEnv) { flyToEnvelope(targetEnv.id); return; }
-      // Search Markers
-      const targetMk = STATE.markers.find(mk => mk.content.toLowerCase().includes(term));
-      if (targetMk) { flyToMarker(targetMk); return; }
+      const filter = searchFilter.value; // 'all', 'env', 'marker'
+      let target = null;
+
+      // 1. Search Envelopes (if allowed)
+      if ((filter === 'all' || filter === 'env') && !target) {
+        target = STATE.envelopes.find(env => env.name.toLowerCase().includes(term));
+        if (target) { flyToEnvelope(target.id); return; }
+      }
+
+      // 2. Search Markers (if allowed)
+      if ((filter === 'all' || filter === 'marker') && !target) {
+        target = STATE.markers.find(mk => mk.content.toLowerCase().includes(term));
+        if (target) { flyToMarker(target); return; }
+      }
       
       alert("Nada encontrado.");
     }
   });
 
-  // --- DRAG GENERIC ---
   function startDragItem(e, item, el) {
     const sx = e.clientX, sy = e.clientY, ex = item.x, ey = item.y, z = STATE.cam.z;
     const move = ev => { item.x = ex + (ev.clientX-sx)/z; item.y = ey + (ev.clientY-sy)/z; el.style.left=item.x+"px"; el.style.top=item.y+"px"; };
