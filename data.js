@@ -1,7 +1,7 @@
 window.RDT_DATA = {
   "cam": {
-    "x": 223.3833515923825,
-    "y": 83.92866933586674,
+    "x": 603.6705324777361,
+    "y": 120.95615490571953,
     "z": 1
   },
   "envelopes": [
@@ -31,14 +31,16 @@ window.RDT_DATA = {
         {
           "id": 1768996164122,
           "text": "EMT-04-MA - Stewart - Calculus 9ed",
-          "url": "https://drive.google.com/open?id=1QbEfyLwn1ahyf-FQqFvg5INYS_Z006vH&usp=drive_fs",
-          "img": "assets/icons/EMT/EMT-04-MA.png"
+          "url": "assets/EMT/Stewart&Outros - Calculus 9ed/Stewart&Outros - Calculus 9ed.html",
+          "img": "assets/icons/EMT/EMT-04-MA.png",
+          "targetEnvId": null
         },
         {
           "id": 1768998332718,
           "text": "EMT-08-MA - Anton&Rorres - Elementary Linear Algebra with Applications 12ed",
-          "url": "https://drive.google.com/open?id=1Q_Ka5Xe3-dtQ2hozasjDIACbpT8krs1K&usp=drive_fs",
-          "img": "assets/icons/EMT/EMT-08-MA.png"
+          "url": "assets/EMT/Anton&Rorres - Elementary Linear Algebra with Applications 12ed.html",
+          "img": "assets/icons/EMT/EMT-08-MA.png",
+          "targetEnvId": null
         },
         {
           "id": 1768998392309,
@@ -49,8 +51,9 @@ window.RDT_DATA = {
         {
           "id": 1768998432501,
           "text": "EMT-18-MA - Zill - A First Course in Differential Eq with Modeling Applic 12ed",
-          "url": "https://drive.google.com/open?id=1QazfSX8utUj0V3Ouz-EqVPAGO1i8iQAc&usp=drive_fs",
-          "img": "assets/icons/EMT/EMT-18-MA.png"
+          "url": "assets/EMT/Zill - A First Course in Differential Equations with Modeling Applications 12ed.html",
+          "img": "assets/icons/EMT/EMT-18-MA.png",
+          "targetEnvId": null
         },
         {
           "id": 1768998480023,
@@ -260,7 +263,7 @@ window.RDT_DATA = {
       "color": "#1e293b",
       "x": 2945.4376628119144,
       "y": -219.18344533684336,
-      "isOpen": false,
+      "isOpen": true,
       "team": [],
       "tags": [
         {
