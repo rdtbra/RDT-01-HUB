@@ -1,7 +1,7 @@
 window.RDT_DATA = {
   "cam": {
-    "x": 173.48185755097825,
-    "y": 85.6354456772039,
+    "x": 4324.410480892511,
+    "y": -2016.8629785400026,
     "z": 1
   },
   "envelopes": [
@@ -263,7 +263,7 @@ window.RDT_DATA = {
       "color": "#1e293b",
       "x": 2945.4376628119144,
       "y": -219.18344533684336,
-      "isOpen": true,
+      "isOpen": false,
       "team": [],
       "tags": [
         {
@@ -461,7 +461,50 @@ window.RDT_DATA = {
       "x": -3405.4389232753238,
       "y": 2165.6837182860963,
       "isOpen": false,
-      "team": [],
+      "team": [
+        {
+          "code": "M01",
+          "label": "Minimax M2|ChatHUB",
+          "url": "https://app.chathub.gg/chat/cloud-minimax-m2?cid=e69bf14f-11f0-4133-9e73-9d4c0f629b0d",
+          "checked": true
+        },
+        {
+          "code": "M02",
+          "label": "GPT-o3|MyHUB.IA",
+          "url": "https://myhub.ia.br/chat/36Uv4nmHVmIfSZNskuJ1ImCdJZw",
+          "checked": true
+        },
+        {
+          "code": "M03",
+          "label": "Ailbaba Qwen 3 Max|MyHUB.IA",
+          "url": "https://myhub.ia.br/chat/36UvPvIKl0wxFVsxISil2mPna0q",
+          "checked": true
+        },
+        {
+          "code": "M04",
+          "label": "Mistral Large 2|Inner.IA",
+          "url": "https://app.innerai.com/projects/9518fc91-c819-4959-ae45-ea80dab1c4f7?sessionId=63f6a767-a648-48cf-822d-662a920d6e3e",
+          "checked": true
+        },
+        {
+          "code": "M05",
+          "label": "Gemini 3 Pro",
+          "url": "https://agent.adapta.one/agentic-chat/019afa18-f79a-7529-ba68-553198a0028c",
+          "checked": true
+        },
+        {
+          "code": "SUP",
+          "label": "ChatGPT-5.2",
+          "url": "https://chatgpt.com/g/g-p-6934e636ece881919c8cd6fa28a149b4-ai-prj-equipes/c/6934e66d-99c4-832a-88cc-9897bcbc9901",
+          "checked": true
+        },
+        {
+          "code": "REV",
+          "label": "gemma-3-27b-it|HugginhFace",
+          "url": "https://huggingface.co/chat/conversation/6966bb33d32088359db12f3a",
+          "checked": true
+        }
+      ],
       "tags": []
     },
     {
@@ -530,8 +573,8 @@ window.RDT_DATA = {
       "id": "mk-1769020229121",
       "type": "text",
       "content": "EMT",
-      "x": 937.9279887396488,
-      "y": 212.89210092780513,
+      "x": 938.8336283880863,
+      "y": 331.53358041999263,
       "size": 15,
       "color": "#207942"
     },
@@ -593,7 +636,7 @@ window.RDT_DATA = {
       "id": "mk-1769024637989",
       "type": "text",
       "content": "Desenvolvimento",
-      "x": -854.5711254237613,
+      "x": -860.0050853846988,
       "y": 2387.0421624999635,
       "size": 15,
       "color": "#09ec77"
