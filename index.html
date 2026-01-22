@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>RDT-01-HUB [v.: 0.15.2]</title>
+  <title>RDT-01-HUB [v.: 0.15.1]</title>
   <style>
     :root{
       --bg: #0f172a; --text: #e6e8ef; --radius: 12px; --accent: #6366f1;
@@ -93,9 +93,10 @@
     .tab-content { flex: 1; padding: 15px; overflow-y: auto; display: none; }
     .tab-content.active { display: block; }
 
-    /* Layout em Grade e Cartões */
+    /* Layout em Grade para Tags e IAs */
     .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 10px; }
 
+    /* Estilo Unificado para Cartões (Etiquetas e IAs) */
     .card-item { 
       display: flex; gap: 10px; padding: 10px; 
       background: rgba(0,0,0,0.3); border: 1px solid var(--border); 
@@ -114,10 +115,8 @@
     .card-info { flex: 1; display: flex; flex-direction: column; gap: 5px; overflow: hidden; }
     .card-text { width: 100%; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; height: 100%; }
     
-    /* Botões internos do card (Ajuste de tamanho) */
-    .card-actions { display: flex; gap: 4px; margin-top: auto; }
-    .card-actions button { flex: 1; padding: 4px 0; font-size: 11px; display: flex; justify-content: center; align-items: center; }
-    
+    /* Botões internos do card */
+    .card-actions { display: flex; gap: 4px; }
     .btn-link-internal { background: var(--accent); color: white; border: none; }
     .btn-link-internal:hover { background: #4338ca; }
 
@@ -153,7 +152,7 @@
   <button id="btnMenu" class="hamburger-btn">≡</button>
 
   <div class="toolbar" id="mainToolbar">
-    <span class="app-title" id="appTitle">RDT-01-HUB [v.: 0.15.2]<span class="unsaved-dot"></span></span>
+    <span class="app-title" id="appTitle">RDT-01-HUB [v.: 0.15.1]<span class="unsaved-dot"></span></span>
     
     <div class="search-box">
       <select id="searchFilter" class="search-filter">
@@ -277,6 +276,9 @@
 
   window.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveSmart(); } });
 
+  const originalRender = render;
+  render = function() { originalRender(); };
+
   function modifyState(action) { action(); markUnsaved(); render(); }
 
   btnMenu.onclick = () => { mainToolbar.classList.toggle("show"); btnMenu.classList.toggle("active"); btnMenu.innerText = mainToolbar.classList.contains("show") ? "✖" : "≡"; };
@@ -292,7 +294,7 @@
   document.getElementById("btnZoomIn").onclick = () => zoomManual(1.2);
   document.getElementById("btnZoomOut").onclick = () => zoomManual(0.8);
 
-  function render() {
+  render = function() {
     world.innerHTML = ''; 
 
     STATE.markers.forEach(mk => {
@@ -321,7 +323,7 @@
       el.ondblclick = (e) => { if(e.target.classList.contains('env-thumb')) { modifyState(() => env.isOpen = true); } };
       world.appendChild(el);
     });
-  }
+  };
 
   function renderContent(el, env) {
     const isOpen = env.isOpen;
@@ -353,12 +355,12 @@
           <div class="card-info">
             <div style="display:flex;justify-content:space-between;align-items:center">
               <span style="font-size:11px;color:#aaa">Link IA</span>
+              <div class="card-actions">
+                <button class="btn btn-edit-team" data-idx="${i}" style="padding:2px 6px;font-size:11px">✏️</button>
+                <button class="btn btn-danger btn-del-team" data-idx="${i}" style="padding:2px 6px;font-size:11px">🗑️</button>
+              </div>
             </div>
             <div style="font-size:13px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${m.label}</div>
-            <div class="card-actions">
-              <button class="btn btn-edit-team" data-idx="${i}">✏️</button>
-              <button class="btn btn-danger btn-del-team" data-idx="${i}">🗑️</button>
-            </div>
           </div>
         </div>
       `).join('');
@@ -375,13 +377,13 @@
               <span style="font-size:11px;color:${hasInternal?'var(--accent)':'#aaa'}">
                 ${hasInternal ? '🔗 Conectado' : (t.url ? '↗ Externo' : 'Sem Link')}
               </span>
+              <div class="card-actions">
+                ${hasInternal ? `<button class="btn btn-link-internal" onclick="flyToEnvelope('${t.targetEnvId}')" style="padding:2px 6px;font-size:11px" title="Ir para Envelope">🔗</button>` : ''}
+                <button class="btn btn-edit-tag" style="padding:2px 6px;font-size:11px">✏️</button>
+                <button class="btn btn-danger btn-del-tag" style="padding:2px 6px;font-size:11px">🗑️</button>
+              </div>
             </div>
             <textarea class="etiqueta-text" placeholder="Comentários...">${t.text}</textarea>
-            <div class="card-actions">
-              ${hasInternal ? `<button class="btn btn-link-internal" onclick="flyToEnvelope('${t.targetEnvId}')" title="Ir para Envelope">🔗</button>` : ''}
-              <button class="btn btn-edit-tag">✏️</button>
-              <button class="btn btn-danger btn-del-tag">🗑️</button>
-            </div>
           </div>
         </div>
       `}).join('');
