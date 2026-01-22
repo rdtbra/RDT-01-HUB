@@ -15,7 +15,7 @@ window.RDT_DATA = {
       "team": [
         {
           "code": "M01",
-          "label": "Link IA ",
+          "label": "Link IA",
           "url": "#",
           "checked": true
         }
