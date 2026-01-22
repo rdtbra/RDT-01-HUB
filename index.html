@@ -3,16 +3,12 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-<<<<<<< HEAD
   <title>RDT-01-HUB [v.: 0.15.2]</title>
-=======
-  <title>RDT-01-HUB [v.: 0.14.1]</title>
->>>>>>> parent of ada7ea5 (Update index.html)
   <style>
     :root{
       --bg: #0f172a; --text: #e6e8ef; --radius: 12px; --accent: #6366f1;
       --card-bg: #1e293b; --border: rgba(255,255,255,0.15);
-      --danger: #ef4444; --success: #22c55e;
+      --danger: #ef4444; --success: #22c55e; --warning: #f59e0b;
     }
     html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;overflow:hidden;touch-action:none;}
     * { box-sizing: border-box; outline: none; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -25,27 +21,21 @@
     .toolbar.show { transform: translateX(0); opacity: 1; }
     .toolbar-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .app-title { font-weight: 800; font-size: 16px; color: #fff; margin-bottom: 5px; display: block; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    
+    .unsaved-dot { display: inline-block; width: 8px; height: 8px; background: var(--warning); border-radius: 50%; margin-left: 5px; opacity: 0; transition: opacity 0.2s; }
+    .unsaved .unsaved-dot { opacity: 1; }
 
     .btn { border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; flex: 1; }
     .btn:active { background: rgba(255,255,255,0.2); }
     .btn-primary { background: var(--accent); border-color: transparent; color: white; }
+    .btn-success { background: var(--success); border-color: transparent; color: white; }
     
     .btn-micro { width: 100%; padding: 4px 0; font-size: 11px; background: transparent; border: 1px dashed rgba(255,255,255,0.2); color: #94a3b8; border-radius: 4px; cursor: pointer; margin-top: -4px; transition: all 0.2s; height: auto; flex: 0 0 auto; }
     .btn-micro:hover { border-color: var(--accent); color: #fff; background: rgba(255,255,255,0.05); }
 
-    /* Search Box Aprimorado */
     .search-box { position: relative; width: 100%; display: flex; gap: 5px; }
-    
-    .search-filter {
-      background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px;
-      color: #fff; padding: 0 5px; font-size: 12px; cursor: pointer; width: 70px;
-    }
-    .search-filter:focus { border-color: var(--accent); }
-
-    .search-input { 
-      background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; 
-      padding: 8px 10px; color: #fff; flex: 1; font-size: 14px; 
-    }
+    .search-filter { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; color: #fff; padding: 0 5px; font-size: 12px; cursor: pointer; width: 70px; }
+    .search-input { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: #fff; flex: 1; font-size: 14px; }
     .search-input:focus { border-color: var(--accent); }
 
     /* --- CANVAS --- */
@@ -103,7 +93,6 @@
     .tab-content { flex: 1; padding: 15px; overflow-y: auto; display: none; }
     .tab-content.active { display: block; }
 
-<<<<<<< HEAD
     /* Layout em Grade e Cartões */
     .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 10px; }
 
@@ -129,19 +118,6 @@
     .card-actions { display: flex; gap: 4px; margin-top: auto; }
     .card-actions button { flex: 1; padding: 4px 0; font-size: 11px; display: flex; justify-content: center; align-items: center; }
     
-=======
-    .team-item { display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; margin-bottom: 6px; border: 1px solid transparent; }
-    .team-code { font-family: monospace; font-size: 11px; background: rgba(99,102,241,0.2); color: #a5b4fc; padding: 2px 6px; border-radius: 4px; min-width: 35px; text-align: center; }
-
-    .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 10px; }
-    .etiqueta { display: flex; gap: 10px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; position: relative; transition: transform 0.2s; }
-    .etiqueta.has-link { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
-    .etiqueta.drag-swap { border-color: var(--success); background: rgba(34, 197, 94, 0.1); }
-    .etiqueta-thumb { width: 60px; height: 60px; background: #000; border-radius: 6px; flex-shrink: 0; cursor: pointer; border: 1px solid var(--border); object-fit: cover; }
-    .etiqueta-thumb:hover { opacity: 0.8; border-color: var(--accent); }
-    .etiqueta-info { flex: 1; display: flex; flex-direction: column; gap: 5px; }
-    .etiqueta-text { width: 100%; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; height: 100%; }
->>>>>>> parent of ada7ea5 (Update index.html)
     .btn-link-internal { background: var(--accent); color: white; border: none; }
     .btn-link-internal:hover { background: #4338ca; }
 
@@ -177,13 +153,8 @@
   <button id="btnMenu" class="hamburger-btn">≡</button>
 
   <div class="toolbar" id="mainToolbar">
-<<<<<<< HEAD
     <span class="app-title" id="appTitle">RDT-01-HUB [v.: 0.15.2]<span class="unsaved-dot"></span></span>
-=======
-    <span class="app-title">RDT-01-HUB [v.: 0.14.1]</span>
->>>>>>> parent of ada7ea5 (Update index.html)
     
-    <!-- SEARCH BOX COM FILTRO -->
     <div class="search-box">
       <select id="searchFilter" class="search-filter">
         <option value="all">★ Todos</option>
@@ -196,7 +167,7 @@
     <div class="toolbar-row">
       <button class="btn btn-primary" id="btnAddEnv"><span>➕</span> Novo</button>
       <button class="btn" id="btnAddMarker">📍 Marcador</button>
-      <button class="btn" id="btnExport">💾 Salvar</button>
+      <button class="btn" id="btnSaveSmart">💾 Salvar</button>
     </div>
     <div class="toolbar-row">
       <button class="btn" id="btnZoomIn">🔍+</button>
@@ -241,6 +212,9 @@
   let editingCtx = null; 
   let isDraggingTag = false;
   let selectedEnvLink = null; 
+  
+  let fileHandle = null;
+  let isUnsaved = false;
 
   const viewport = document.getElementById("viewport");
   const world = document.getElementById("world");
@@ -249,6 +223,7 @@
   const searchFilter = document.getElementById("searchFilter");
   const mainToolbar = document.getElementById("mainToolbar");
   const btnMenu = document.getElementById("btnMenu");
+  const appTitle = document.getElementById("appTitle");
 
   function init() {
     if (window.RDT_DATA) {
@@ -268,7 +243,6 @@
     render();
   }
 
-<<<<<<< HEAD
   function markUnsaved() { if(!isUnsaved) { isUnsaved = true; appTitle.classList.add('unsaved'); } }
 
   async function saveSmart() {
@@ -306,24 +280,13 @@
   function modifyState(action) { action(); markUnsaved(); render(); }
 
   btnMenu.onclick = () => { mainToolbar.classList.toggle("show"); btnMenu.classList.toggle("active"); btnMenu.innerText = mainToolbar.classList.contains("show") ? "✖" : "≡"; };
-=======
-  btnMenu.onclick = () => {
-    mainToolbar.classList.toggle("show");
-    btnMenu.classList.toggle("active");
-    btnMenu.innerText = mainToolbar.classList.contains("show") ? "✖" : "≡";
-  };
->>>>>>> parent of ada7ea5 (Update index.html)
 
   function zoomManual(factor) {
     const rect = viewport.getBoundingClientRect();
-    const cx = rect.width / 2;
-    const cy = rect.height / 2;
-    const wx = (cx - STATE.cam.x) / STATE.cam.z;
-    const wy = (cy - STATE.cam.y) / STATE.cam.z;
+    const cx = rect.width / 2; const cy = rect.height / 2;
+    const wx = (cx - STATE.cam.x) / STATE.cam.z; const wy = (cy - STATE.cam.y) / STATE.cam.z;
     let newZ = Math.max(0.1, Math.min(5, STATE.cam.z * factor));
-    STATE.cam.x = cx - wx * newZ;
-    STATE.cam.y = cy - wy * newZ;
-    STATE.cam.z = newZ;
+    STATE.cam.x = cx - wx * newZ; STATE.cam.y = cy - wy * newZ; STATE.cam.z = newZ;
     applyCam();
   }
   document.getElementById("btnZoomIn").onclick = () => zoomManual(1.2);
@@ -332,47 +295,30 @@
   function render() {
     world.innerHTML = ''; 
 
-    // Render Markers
     STATE.markers.forEach(mk => {
-      const el = document.createElement("div");
-      el.className = "marker";
-      el.id = mk.id;
-      el.style.left = mk.x + "px";
-      el.style.top = mk.y + "px";
-      
-      if (mk.type === 'image') {
-        el.innerHTML = `<img src="${mk.content}" class="marker-img" style="width:${mk.size||100}px; height:${mk.size||100}px">`;
-      } else {
-        el.innerHTML = `<div class="marker-text" style="font-size:${mk.size||24}px; color:${mk.color||'#fff'}">${mk.content}</div>`;
-      }
-
+      const el = document.createElement("div"); el.className = "marker"; el.id = mk.id;
+      el.style.left = mk.x + "px"; el.style.top = mk.y + "px";
+      if (mk.type === 'image') { el.innerHTML = `<img src="${mk.content}" class="marker-img" style="width:${mk.size||100}px; height:${mk.size||100}px">`; } 
+      else { el.innerHTML = `<div class="marker-text" style="font-size:${mk.size||24}px; color:${mk.color||'#fff'}">${mk.content}</div>`; }
       el.onpointerdown = (e) => { e.preventDefault(); e.stopPropagation(); startDragItem(e, mk, el); };
       el.ondblclick = (e) => { e.stopPropagation(); openEditor('marker', mk); };
-      el.oncontextmenu = (e) => { e.preventDefault(); if(confirm("Apagar Marcador?")) { STATE.markers = STATE.markers.filter(m => m.id !== mk.id); render(); } };
-
+      el.oncontextmenu = (e) => { e.preventDefault(); if(confirm("Apagar Marcador?")) modifyState(() => STATE.markers = STATE.markers.filter(m => m.id !== mk.id)); };
       world.appendChild(el);
     });
 
-    // Render Envelopes
     STATE.envelopes.forEach(env => {
       const el = document.createElement("div"); el.id = env.id; el.className = "envelope"; 
-      
       el.style.left = env.x + "px"; el.style.top = env.y + "px";
       const baseColor = env.color || ENV_PALETTE[0];
       el.style.background = env.isOpen ? `linear-gradient(145deg, ${baseColor}, #0f172a)` : baseColor;
-
       if (env.isOpen) { el.classList.add("open"); el.style.zIndex = 100 + STATE.envelopes.indexOf(env); }
       else { el.classList.remove("open"); el.style.zIndex = ""; }
-
       renderContent(el, env);
-      
       el.onpointerdown = (e) => {
-        if(e.target.closest('input, textarea, button, .etiqueta-thumb, .env-name, .color-dot, .team-item')) return;
+        if(e.target.closest('input, textarea, button, .card-thumb, .env-name, .color-dot')) return;
         if(e.target.closest('.env-head')) { startDragItem(e, env, el); e.stopPropagation(); }
       };
-      
-      el.ondblclick = (e) => { if(e.target.classList.contains('env-thumb')) { env.isOpen = true; render(); } };
-
+      el.ondblclick = (e) => { if(e.target.classList.contains('env-thumb')) { modifyState(() => env.isOpen = true); } };
       world.appendChild(el);
     });
   }
@@ -400,8 +346,8 @@
           <div class="env-stats">${env.tags.length} etiquetas • ${env.team.length} IAs</div>
         </div>`;
     } else {
+      // GRID DE IAs (Novo Layout)
       const teamHTML = env.team.map((m, i) => `
-<<<<<<< HEAD
         <div class="card-item">
           <div class="card-thumb" style="background:rgba(99,102,241,0.2); color:#a5b4fc; font-weight:bold; font-size:14px" onclick="window.open('${m.url}','_blank')">${m.code||'IA'}</div>
           <div class="card-info">
@@ -414,38 +360,21 @@
               <button class="btn btn-danger btn-del-team" data-idx="${i}">🗑️</button>
             </div>
           </div>
-=======
-        <div class="team-item">
-          <input type="checkbox" class="chk-team" data-idx="${i}" ${m.checked?'checked':''}>
-          <span class="team-code">${m.code||'#'}</span>
-          <a href="${m.url}" target="_blank" style="flex:1;color:#fff;text-decoration:none;font-size:13px">${m.label}</a>
-          <button class="btn btn-edit-team" data-idx="${i}">✏️</button>
-          <button class="btn btn-danger btn-del-team" data-idx="${i}">🗑️</button>
-          <button class="btn" onclick="window.open('${m.url}','_blank')">↗</button>
->>>>>>> parent of ada7ea5 (Update index.html)
         </div>
       `).join('');
 
       const tagsHTML = env.tags.map(t => {
         const hasInternal = !!t.targetEnvId;
         return `
-        <div class="etiqueta ${hasInternal ? 'has-link' : ''}" data-id="${t.id}">
-          <img src="${t.img}" class="etiqueta-thumb" title="Abrir Link / Arrastar" 
+        <div class="card-item ${hasInternal ? 'has-link' : ''}" data-id="${t.id}">
+          <img src="${t.img}" class="card-thumb" title="Abrir Link / Arrastar" 
                onclick="handleTagImageClick('${t.url||''}')" 
                onerror="this.src='https://placehold.co/60x60/333/FFF?text=ERR'">
-          <div class="etiqueta-info">
+          <div class="card-info">
             <div style="display:flex;justify-content:space-between;align-items:center">
               <span style="font-size:11px;color:${hasInternal?'var(--accent)':'#aaa'}">
                 ${hasInternal ? '🔗 Conectado' : (t.url ? '↗ Externo' : 'Sem Link')}
               </span>
-<<<<<<< HEAD
-=======
-              <div style="display:flex;gap:4px">
-                ${hasInternal ? `<button class="btn btn-link-internal" onclick="flyToEnvelope('${t.targetEnvId}')" style="padding:2px 6px;font-size:11px" title="Ir para Envelope">🔗</button>` : ''}
-                <button class="btn btn-edit-tag" style="padding:2px 6px;font-size:11px">✏️</button>
-                <button class="btn btn-danger btn-del-tag" style="padding:2px 6px;font-size:11px">🗑️</button>
-              </div>
->>>>>>> parent of ada7ea5 (Update index.html)
             </div>
             <textarea class="etiqueta-text" placeholder="Comentários...">${t.text}</textarea>
             <div class="card-actions">
@@ -457,6 +386,8 @@
         </div>
       `}).join('');
 
+      const activeTab = env.activeTab || 'tags';
+
       el.innerHTML = headerHTML + `
         <div class="env-open">
           <div class="col-left">
@@ -467,17 +398,16 @@
           </div>
           <div class="col-right">
             <div class="tabs-head">
-              <button class="tab-btn active" data-tab="tags">Etiquetas (${env.tags.length})</button>
-              <button class="tab-btn" data-tab="team">Equipe IA (${env.team.length})</button>
+              <button class="tab-btn ${activeTab==='tags'?'active':''}" data-tab="tags">Etiquetas (${env.tags.length})</button>
+              <button class="tab-btn ${activeTab==='team'?'active':''}" data-tab="team">Equipe IA (${env.team.length})</button>
             </div>
-            <div class="tab-content active" id="tab-tags">
-              <div class="tags-grid">${tagsHTML}</div>
+            <div class="tab-content ${activeTab==='tags'?'active':''}" id="tab-tags">
+              <div class="grid-container">${tagsHTML}</div>
               <button class="btn btn-add-tag" style="width:100%;margin-top:10px">➕ Nova Etiqueta</button>
             </div>
-            <div class="tab-content" id="tab-team">
-              <button class="btn btn-primary btn-open-all" style="width:100%;margin-bottom:10px">🚀 Abrir Selecionados</button>
-              <div style="display:flex;flex-direction:column;gap:4px">${teamHTML}</div>
-              <button class="btn btn-add-team" style="width:100%;margin-top:10px">➕ Novo Link</button>
+            <div class="tab-content ${activeTab==='team'?'active':''}" id="tab-team">
+              <div class="grid-container">${teamHTML}</div>
+              <button class="btn btn-add-team" style="width:100%;margin-top:10px">➕ Novo Link IA</button>
             </div>
           </div>
         </div>`;
@@ -491,7 +421,7 @@
   window.flyToEnvelope = (id) => {
     const target = STATE.envelopes.find(e => e.id == id);
     if (target) {
-      target.isOpen = true; render();
+      modifyState(() => target.isOpen = true);
       const w = 950, h = 600;
       const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
       STATE.cam.x = cx - target.x - (w / 2);
@@ -515,55 +445,52 @@
   }
 
   function attachEvents(el, env) {
-    const btnOpen = el.querySelector('.btn-open'); if(btnOpen) btnOpen.onclick = () => { env.isOpen = true; render(); };
-    const btnClose = el.querySelector('.btn-close'); if(btnClose) btnClose.onclick = () => { env.isOpen = false; render(); };
-    const btnDelEnv = el.querySelector('.btn-del-env'); if(btnDelEnv) btnDelEnv.onclick = () => { if(confirm("Apagar?")) { STATE.envelopes = STATE.envelopes.filter(e=>e.id!==env.id); el.remove(); } };
+    const btnOpen = el.querySelector('.btn-open'); if(btnOpen) btnOpen.onclick = () => modifyState(() => env.isOpen = true);
+    const btnClose = el.querySelector('.btn-close'); if(btnClose) btnClose.onclick = () => modifyState(() => env.isOpen = false);
+    const btnDelEnv = el.querySelector('.btn-del-env'); if(btnDelEnv) btnDelEnv.onclick = () => { if(confirm("Apagar?")) modifyState(() => STATE.envelopes = STATE.envelopes.filter(e=>e.id!==env.id)); };
     
     const nameEl = el.querySelector('.env-name');
     if(nameEl) {
-      nameEl.onblur = () => { env.name = nameEl.innerText; };
+      nameEl.onblur = () => { if(env.name !== nameEl.innerText) modifyState(() => env.name = nameEl.innerText); };
       nameEl.onkeydown = e => { if(e.key==='Enter'){e.preventDefault(); nameEl.blur();} };
       nameEl.onpointerdown = e => e.stopPropagation();
     }
 
     if(env.isOpen) {
-      el.querySelectorAll('.color-dot').forEach(d => d.onclick = () => { env.color = d.dataset.c; render(); });
-      const desc = el.querySelector('.desc-area'); if(desc) desc.oninput = () => env.description = desc.value;
-      el.querySelector('.btn-change-cover').onclick = () => { const url = prompt("URL da Capa:", env.icon); if(url!==null) { env.icon = url; render(); } };
+      el.querySelectorAll('.color-dot').forEach(d => d.onclick = () => modifyState(() => env.color = d.dataset.c));
+      const desc = el.querySelector('.desc-area'); if(desc) desc.oninput = () => { env.description = desc.value; markUnsaved(); }; 
+      el.querySelector('.btn-change-cover').onclick = () => { const url = prompt("URL da Capa:", env.icon); if(url!==null) modifyState(() => env.icon = url); };
 
+      // Tab Switching com Persistência
       el.querySelectorAll('.tab-btn').forEach(btn => btn.onclick = () => {
-        el.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        el.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        el.querySelector(btn.dataset.tab === 'team' ? '#tab-team' : '#tab-tags').classList.add('active');
+        modifyState(() => env.activeTab = btn.dataset.tab);
       });
 
-      el.querySelectorAll('.chk-team').forEach(chk => chk.onchange = () => env.team[chk.dataset.idx].checked = chk.checked);
-      const btnAll = el.querySelector('.btn-open-all'); 
-      if(btnAll) btnAll.onclick = () => { let d=0; env.team.filter(m=>m.checked).forEach(m => { setTimeout(() => window.open(m.url,'_blank'), d); d+=300; }); };
       const btnAddTeam = el.querySelector('.btn-add-team');
-      if(btnAddTeam) btnAddTeam.onclick = () => { const n={code:"LNK", label:"Novo", url:"#", checked:true}; env.team.push(n); render(); openEditor('team', n, env); };
+      if(btnAddTeam) btnAddTeam.onclick = () => { const n={code:"LNK", label:"Novo", url:"#", checked:true}; env.team.push(n); modifyState(() => {}); openEditor('team', n, env); };
       el.querySelectorAll('.btn-edit-team').forEach(btn => btn.onclick = () => openEditor('team', env.team[btn.dataset.idx], env));
-      el.querySelectorAll('.btn-del-team').forEach(btn => btn.onclick = () => { if(confirm("Excluir?")) { env.team.splice(btn.dataset.idx, 1); render(); } });
+      el.querySelectorAll('.btn-del-team').forEach(btn => btn.onclick = () => { if(confirm("Excluir?")) modifyState(() => env.team.splice(btn.dataset.idx, 1)); });
 
       const btnAddTag = el.querySelector('.btn-add-tag');
-      if(btnAddTag) btnAddTag.onclick = () => { const n={id:Date.now(), text:"", url:"", img:`https://placehold.co/60x60/333/FFF?text=IMG`, targetEnvId: ""}; env.tags.push(n); render(); openEditor('tag', n, env); };
-      el.querySelectorAll('.etiqueta-text').forEach(inp => inp.oninput = e => { const t = env.tags.find(tag=>tag.id==e.target.closest('.etiqueta').dataset.id); if(t) t.text = e.target.value; });
-      el.querySelectorAll('.btn-edit-tag').forEach(btn => btn.onclick = e => { const id = e.target.closest('.etiqueta').dataset.id; openEditor('tag', env.tags.find(t=>t.id==id), env); });
-      el.querySelectorAll('.btn-del-tag').forEach(btn => btn.onclick = e => { if(confirm("Excluir?")) { const id = e.target.closest('.etiqueta').dataset.id; env.tags = env.tags.filter(t=>t.id!=id); render(); } });
+      if(btnAddTag) btnAddTag.onclick = () => { const n={id:Date.now(), text:"", url:"", img:`https://placehold.co/60x60/333/FFF?text=IMG`, targetEnvId: ""}; env.tags.push(n); modifyState(() => {}); openEditor('tag', n, env); };
+      el.querySelectorAll('.etiqueta-text').forEach(inp => inp.oninput = e => { const t = env.tags.find(tag=>tag.id==e.target.closest('.card-item').dataset.id); if(t) { t.text = e.target.value; markUnsaved(); } });
+      el.querySelectorAll('.btn-edit-tag').forEach(btn => btn.onclick = e => { const id = e.target.closest('.card-item').dataset.id; openEditor('tag', env.tags.find(t=>t.id==id), env); });
+      el.querySelectorAll('.btn-del-tag').forEach(btn => btn.onclick = e => { if(confirm("Excluir?")) { const id = e.target.closest('.card-item').dataset.id; modifyState(() => env.tags = env.tags.filter(t=>t.id!=id)); } });
       
       el.querySelectorAll('.btn-link-tag').forEach(btn => btn.onclick = e => {
-        const id = e.target.closest('.etiqueta').dataset.id;
+        const id = e.target.closest('.card-item').dataset.id;
         const tag = env.tags.find(t => t.id == id);
         openEditor('tag', tag, env); 
       });
 
-      el.querySelectorAll('.etiqueta-thumb').forEach(img => {
+      el.querySelectorAll('.card-thumb').forEach(img => {
         img.onpointerdown = (e) => {
           e.preventDefault(); e.stopPropagation();
-          const tagId = img.closest('.etiqueta').dataset.id;
-          const tag = env.tags.find(t => t.id == tagId);
-          startDragTag(e, tag, env);
+          const tagId = img.closest('.card-item').dataset.id;
+          if(tagId) { // Só arrasta se for tag (tem ID)
+            const tag = env.tags.find(t => t.id == tagId);
+            if(tag) startDragTag(e, tag, env);
+          }
         };
       });
     }
@@ -577,7 +504,7 @@
     else if (direction === 'bottom') { newTags.splice(idx, 1); newTags.push(tag); } 
     else if (direction === 'up' && idx > 0) { [newTags[idx], newTags[idx-1]] = [newTags[idx-1], newTags[idx]]; } 
     else if (direction === 'down' && idx < newTags.length - 1) { [newTags[idx], newTags[idx+1]] = [newTags[idx+1], newTags[idx]]; }
-    env.tags = newTags; render();
+    modifyState(() => env.tags = newTags);
   }
 
   function openEditor(type, item, env) {
@@ -643,53 +570,56 @@
   document.getElementById("btnSaveModal").onclick = () => {
     if (editingCtx) {
       const { type, item, env } = editingCtx;
-      if (type === 'team') { 
-        item.code = document.getElementById("inpCode").value; 
-        item.label = document.getElementById("inpLabel").value; 
-        item.url = document.getElementById("inpUrl").value; 
-      } else if (type === 'marker') {
-        item.type = document.getElementById("inpType").value;
-        item.content = document.getElementById("inpContent").value;
-        item.size = parseInt(document.getElementById("inpSize").value);
-        item.color = document.getElementById("inpColor").value;
-      } else { 
-        item.text = document.getElementById("inpText").value; 
-        item.url = document.getElementById("inpUrl").value; 
-        item.img = document.getElementById("inpImg").value; 
-        item.targetEnvId = selectedEnvLink; 
-      }
-      render();
+      modifyState(() => {
+        if (type === 'team') { 
+          item.code = document.getElementById("inpCode").value; 
+          item.label = document.getElementById("inpLabel").value; 
+          item.url = document.getElementById("inpUrl").value; 
+        } else if (type === 'marker') {
+          item.type = document.getElementById("inpType").value;
+          item.content = document.getElementById("inpContent").value;
+          item.size = parseInt(document.getElementById("inpSize").value);
+          item.color = document.getElementById("inpColor").value;
+        } else { 
+          item.text = document.getElementById("inpText").value; 
+          item.url = document.getElementById("inpUrl").value; 
+          item.img = document.getElementById("inpImg").value; 
+          item.targetEnvId = selectedEnvLink; 
+        }
+      });
     }
     modal.classList.add("hidden");
   };
 
-  // --- SEARCH LOGIC (REFINED) ---
+  // --- SEARCH LOGIC ---
   searchInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       const term = searchInput.value.toLowerCase();
-      const filter = searchFilter.value; // 'all', 'env', 'marker'
+      const filter = searchFilter.value; 
       let target = null;
-
-      // 1. Search Envelopes (if allowed)
       if ((filter === 'all' || filter === 'env') && !target) {
         target = STATE.envelopes.find(env => env.name.toLowerCase().includes(term));
         if (target) { flyToEnvelope(target.id); return; }
       }
-
-      // 2. Search Markers (if allowed)
       if ((filter === 'all' || filter === 'marker') && !target) {
         target = STATE.markers.find(mk => mk.content.toLowerCase().includes(term));
         if (target) { flyToMarker(target); return; }
       }
-      
       alert("Nada encontrado.");
     }
   });
 
   function startDragItem(e, item, el) {
     const sx = e.clientX, sy = e.clientY, ex = item.x, ey = item.y, z = STATE.cam.z;
-    const move = ev => { item.x = ex + (ev.clientX-sx)/z; item.y = ey + (ev.clientY-sy)/z; el.style.left=item.x+"px"; el.style.top=item.y+"px"; };
-    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
+    let hasMoved = false;
+    const move = ev => { 
+      hasMoved = true;
+      item.x = ex + (ev.clientX-sx)/z; item.y = ey + (ev.clientY-sy)/z; el.style.left=item.x+"px"; el.style.top=item.y+"px"; 
+    };
+    const up = () => { 
+      window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); 
+      if(hasMoved) markUnsaved();
+    };
     window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
   }
 
@@ -705,11 +635,11 @@
       ghost.style.display = 'none'; const elem = document.elementFromPoint(ev.clientX, ev.clientY); ghost.style.display = 'flex';
       const envEl = elem ? elem.closest('.envelope') : null;
       document.querySelectorAll('.envelope.drag-over').forEach(el => el.classList.remove('drag-over'));
-      document.querySelectorAll('.etiqueta.drag-swap').forEach(el => el.classList.remove('drag-swap'));
+      document.querySelectorAll('.card-item.drag-swap').forEach(el => el.classList.remove('drag-swap'));
       if (envEl && envEl.classList.contains('open')) {
         targetEnvId = envEl.id;
         if (targetEnvId === sourceEnv.id) {
-           const tagEl = elem.closest('.etiqueta');
+           const tagEl = elem.closest('.card-item');
            if (tagEl && tagEl.dataset.id != tag.id) { swapTargetId = parseInt(tagEl.dataset.id); tagEl.classList.add('drag-swap'); } else { swapTargetId = null; }
         } else { envEl.classList.add('drag-over'); }
       } else { targetEnvId = null; }
@@ -717,18 +647,20 @@
     const up = () => {
       window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); ghost.remove();
       document.querySelectorAll('.envelope.drag-over').forEach(el => el.classList.remove('drag-over'));
-      document.querySelectorAll('.etiqueta.drag-swap').forEach(el => el.classList.remove('drag-swap'));
+      document.querySelectorAll('.card-item.drag-swap').forEach(el => el.classList.remove('drag-swap'));
       setTimeout(() => isDraggingTag = false, 100);
       if (hasMoved && targetEnvId) {
         const targetEnv = STATE.envelopes.find(e => e.id === targetEnvId);
         if (targetEnv) {
-          if (targetEnv.id === sourceEnv.id && swapTargetId) {
-            const idx1 = sourceEnv.tags.findIndex(t => t.id === tag.id);
-            const idx2 = sourceEnv.tags.findIndex(t => t.id === swapTargetId);
-            if (idx1 > -1 && idx2 > -1) { [sourceEnv.tags[idx1], sourceEnv.tags[idx2]] = [sourceEnv.tags[idx2], sourceEnv.tags[idx1]]; render(); }
-          } else if (targetEnv.id !== sourceEnv.id) {
-            sourceEnv.tags = sourceEnv.tags.filter(t => t.id !== tag.id); targetEnv.tags.push(tag); render();
-          }
+          modifyState(() => {
+            if (targetEnv.id === sourceEnv.id && swapTargetId) {
+              const idx1 = sourceEnv.tags.findIndex(t => t.id === tag.id);
+              const idx2 = sourceEnv.tags.findIndex(t => t.id === swapTargetId);
+              if (idx1 > -1 && idx2 > -1) { [sourceEnv.tags[idx1], sourceEnv.tags[idx2]] = [sourceEnv.tags[idx2], sourceEnv.tags[idx1]]; }
+            } else if (targetEnv.id !== sourceEnv.id) {
+              sourceEnv.tags = sourceEnv.tags.filter(t => t.id !== tag.id); targetEnv.tags.push(tag);
+            }
+          });
         }
       }
     };
@@ -739,8 +671,15 @@
     e.preventDefault(); 
     const el = document.getElementById(env.id); el.style.zIndex = 200; 
     const sx=e.clientX, sy=e.clientY, ex=env.x, ey=env.y, z=STATE.cam.z;
-    const move = ev => { env.x = ex + (ev.clientX-sx)/z; env.y = ey + (ev.clientY-sy)/z; el.style.left=env.x+"px"; el.style.top=env.y+"px"; };
-    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); el.style.zIndex=env.isOpen?100:""; };
+    let hasMoved = false;
+    const move = ev => { 
+      hasMoved = true;
+      env.x = ex + (ev.clientX-sx)/z; env.y = ey + (ev.clientY-sy)/z; el.style.left=env.x+"px"; el.style.top=env.y+"px"; 
+    };
+    const up = () => { 
+      window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); el.style.zIndex=env.isOpen?100:""; 
+      if(hasMoved) markUnsaved();
+    };
     window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
   }
 
@@ -759,8 +698,10 @@
   viewport.onpointerup = () => { panning=false; viewport.classList.remove('dragging'); };
   viewport.onwheel = e => { if(!e.ctrlKey)return; e.preventDefault(); const f=e.deltaY>0?0.9:1.1; STATE.cam.z=Math.max(0.2, Math.min(3, STATE.cam.z*f)); applyCam(); };
 
-  document.getElementById("btnAddEnv").onclick = () => { STATE.envelopes.push({id:`env-${Date.now()}`, name:"Novo", color:ENV_PALETTE[0], x: -STATE.cam.x+window.innerWidth/2-140, y: -STATE.cam.y+window.innerHeight/2-100, isOpen:true, team:[], tags:[]}); render(); };
-  document.getElementById("btnAddMarker").onclick = () => { STATE.markers.push({id:`mk-${Date.now()}`, type:'text', content:'NOVO', x: -STATE.cam.x+window.innerWidth/2, y: -STATE.cam.y+window.innerHeight/2, size:30, color:'#ffffff'}); render(); };
+  document.getElementById("btnAddEnv").onclick = () => { modifyState(() => STATE.envelopes.push({id:`env-${Date.now()}`, name:"Novo", color:ENV_PALETTE[0], x: -STATE.cam.x+window.innerWidth/2-140, y: -STATE.cam.y+window.innerHeight/2-100, isOpen:true, team:[], tags:[]})); };
+  document.getElementById("btnAddMarker").onclick = () => { modifyState(() => STATE.markers.push({id:`mk-${Date.now()}`, type:'text', content:'NOVO', x: -STATE.cam.x+window.innerWidth/2, y: -STATE.cam.y+window.innerHeight/2, size:30, color:'#ffffff'})); };
+  
+  document.getElementById("btnSaveSmart").onclick = saveSmart;
   document.getElementById("btnExport").onclick = () => { const b=new Blob([`window.RDT_DATA = ${JSON.stringify(STATE, null, 2)};`], {type:"text/javascript"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="data.js"; a.click(); };
   document.getElementById("btnLoad").onclick = () => document.getElementById("fileInput").click();
   document.getElementById("fileInput").onchange = e => { const f=e.target.files[0]; if(f){ const r=new FileReader(); r.onload=ev=>{ try{ STATE=JSON.parse(ev.target.result.replace(/^window\.RDT_DATA\s*=\s*/,'').replace(/;?\s*$/,'')); applyCam(); render(); }catch(e){alert("Erro");} }; r.readAsText(f); e.target.value=''; }};
