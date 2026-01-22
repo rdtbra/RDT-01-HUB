@@ -4,11 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
 <<<<<<< HEAD
-<<<<<<< HEAD
   <title>RDT-01-HUB [v.: 0.15.2]</title>
-=======
-  <title>RDT-01-HUB [v.: 0.14.1]</title>
->>>>>>> parent of ada7ea5 (Update index.html)
 =======
   <title>RDT-01-HUB [v.: 0.14.1]</title>
 >>>>>>> parent of ada7ea5 (Update index.html)
@@ -108,7 +104,6 @@
     .tab-content.active { display: block; }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
     /* Layout em Grade e Cartões */
     .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 10px; }
 
@@ -138,11 +133,6 @@
     .team-item { display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; margin-bottom: 6px; border: 1px solid transparent; }
     .team-code { font-family: monospace; font-size: 11px; background: rgba(99,102,241,0.2); color: #a5b4fc; padding: 2px 6px; border-radius: 4px; min-width: 35px; text-align: center; }
 
-=======
-    .team-item { display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; margin-bottom: 6px; border: 1px solid transparent; }
-    .team-code { font-family: monospace; font-size: 11px; background: rgba(99,102,241,0.2); color: #a5b4fc; padding: 2px 6px; border-radius: 4px; min-width: 35px; text-align: center; }
-
->>>>>>> parent of ada7ea5 (Update index.html)
     .tags-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 10px; }
     .etiqueta { display: flex; gap: 10px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; position: relative; transition: transform 0.2s; }
     .etiqueta.has-link { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
@@ -151,9 +141,6 @@
     .etiqueta-thumb:hover { opacity: 0.8; border-color: var(--accent); }
     .etiqueta-info { flex: 1; display: flex; flex-direction: column; gap: 5px; }
     .etiqueta-text { width: 100%; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; height: 100%; }
-<<<<<<< HEAD
->>>>>>> parent of ada7ea5 (Update index.html)
-=======
 >>>>>>> parent of ada7ea5 (Update index.html)
     .btn-link-internal { background: var(--accent); color: white; border: none; }
     .btn-link-internal:hover { background: #4338ca; }
@@ -191,11 +178,7 @@
 
   <div class="toolbar" id="mainToolbar">
 <<<<<<< HEAD
-<<<<<<< HEAD
     <span class="app-title" id="appTitle">RDT-01-HUB [v.: 0.15.2]<span class="unsaved-dot"></span></span>
-=======
-    <span class="app-title">RDT-01-HUB [v.: 0.14.1]</span>
->>>>>>> parent of ada7ea5 (Update index.html)
 =======
     <span class="app-title">RDT-01-HUB [v.: 0.14.1]</span>
 >>>>>>> parent of ada7ea5 (Update index.html)
@@ -286,7 +269,6 @@
   }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
   function markUnsaved() { if(!isUnsaved) { isUnsaved = true; appTitle.classList.add('unsaved'); } }
 
   async function saveSmart() {
@@ -325,16 +307,11 @@
 
   btnMenu.onclick = () => { mainToolbar.classList.toggle("show"); btnMenu.classList.toggle("active"); btnMenu.innerText = mainToolbar.classList.contains("show") ? "✖" : "≡"; };
 =======
-=======
->>>>>>> parent of ada7ea5 (Update index.html)
   btnMenu.onclick = () => {
     mainToolbar.classList.toggle("show");
     btnMenu.classList.toggle("active");
     btnMenu.innerText = mainToolbar.classList.contains("show") ? "✖" : "≡";
   };
-<<<<<<< HEAD
->>>>>>> parent of ada7ea5 (Update index.html)
-=======
 >>>>>>> parent of ada7ea5 (Update index.html)
 
   function zoomManual(factor) {
@@ -425,7 +402,6 @@
     } else {
       const teamHTML = env.team.map((m, i) => `
 <<<<<<< HEAD
-<<<<<<< HEAD
         <div class="card-item">
           <div class="card-thumb" style="background:rgba(99,102,241,0.2); color:#a5b4fc; font-weight:bold; font-size:14px" onclick="window.open('${m.url}','_blank')">${m.code||'IA'}</div>
           <div class="card-info">
@@ -439,8 +415,6 @@
             </div>
           </div>
 =======
-=======
->>>>>>> parent of ada7ea5 (Update index.html)
         <div class="team-item">
           <input type="checkbox" class="chk-team" data-idx="${i}" ${m.checked?'checked':''}>
           <span class="team-code">${m.code||'#'}</span>
@@ -448,9 +422,6 @@
           <button class="btn btn-edit-team" data-idx="${i}">✏️</button>
           <button class="btn btn-danger btn-del-team" data-idx="${i}">🗑️</button>
           <button class="btn" onclick="window.open('${m.url}','_blank')">↗</button>
-<<<<<<< HEAD
->>>>>>> parent of ada7ea5 (Update index.html)
-=======
 >>>>>>> parent of ada7ea5 (Update index.html)
         </div>
       `).join('');
@@ -468,10 +439,7 @@
                 ${hasInternal ? '🔗 Conectado' : (t.url ? '↗ Externo' : 'Sem Link')}
               </span>
 <<<<<<< HEAD
-<<<<<<< HEAD
 =======
-=======
->>>>>>> parent of ada7ea5 (Update index.html)
               <div style="display:flex;gap:4px">
                 ${hasInternal ? `<button class="btn btn-link-internal" onclick="flyToEnvelope('${t.targetEnvId}')" style="padding:2px 6px;font-size:11px" title="Ir para Envelope">🔗</button>` : ''}
                 <button class="btn btn-edit-tag" style="padding:2px 6px;font-size:11px">✏️</button>
